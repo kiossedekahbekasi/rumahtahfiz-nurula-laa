@@ -28,7 +28,12 @@ import {
   Send,
   FileSpreadsheet,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Mail,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  UserCheck
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -54,6 +59,10 @@ interface AdminPanelModalProps {
   }>>;
   adminPin: string;
   setAdminPin: (pin: string) => void;
+  adminEmail: string;
+  setAdminEmail: (email: string) => void;
+  adminPassword: string;
+  setAdminPassword: (pass: string) => void;
   onResetData: () => void;
 }
 
@@ -70,12 +79,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   setStats,
   adminPin,
   setAdminPin,
+  adminEmail,
+  setAdminEmail,
+  adminPassword,
+  setAdminPassword,
   onResetData,
 }) => {
-  // Auth PIN state
+  // Auth Login state
+  const [loginMode, setLoginMode] = useState<'email' | 'pin'>('email');
+  const [inputEmail, setInputEmail] = useState('');
+  const [inputPassword, setInputPassword] = useState('');
   const [inputPin, setInputPin] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinError, setPinError] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authSuccessMsg, setAuthSuccessMsg] = useState('');
+
+  // Settings Credentials State
+  const [editEmail, setEditEmail] = useState(adminEmail);
+  const [editPassword, setEditPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   // Navigation tab inside Admin Panel
   const [activeAdminTab, setActiveAdminTab] = useState<'sheets' | 'produk' | 'santri' | 'stats' | 'settings'>('sheets');
@@ -126,15 +149,79 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Handle Login Email & Password
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      inputEmail.trim().toLowerCase() === adminEmail.trim().toLowerCase() &&
+      inputPassword === adminPassword
+    ) {
+      setIsAuthenticated(true);
+      setAuthError('');
+    } else {
+      setAuthError('Email atau Password Admin salah! (Default: admin@kiossedekah.com / admin123)');
+    }
+  };
+
   // Handle Login PIN
   const handlePinSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputPin === adminPin) {
       setIsAuthenticated(true);
-      setPinError('');
+      setAuthError('');
     } else {
-      setPinError('PIN Admin Salah! (Default: 123456)');
+      setAuthError('PIN Admin Salah! (Default: 123456)');
     }
+  };
+
+  // Quick Auto-Fill Default Credentials
+  const handleAutoFillDefault = () => {
+    if (loginMode === 'email') {
+      setInputEmail(adminEmail);
+      setInputPassword(adminPassword);
+    } else {
+      setInputPin(adminPin);
+    }
+    setAuthError('');
+  };
+
+  // Update Email & Password in Settings
+  const handleSaveCredentials = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editEmail.trim()) {
+      alert('Email tidak boleh kosong!');
+      return;
+    }
+    if (editPassword) {
+      if (editPassword !== confirmPassword) {
+        alert('Konfirmasi password tidak cocok!');
+        return;
+      }
+      setAdminPassword(editPassword);
+    }
+    setAdminEmail(editEmail.trim());
+    setEditPassword('');
+    setConfirmPassword('');
+    setAuthSuccessMsg('Email & Password Admin berhasil diperbarui!');
+    setTimeout(() => setAuthSuccessMsg(''), 4000);
+  };
+
+  // Update PIN in Settings
+  const handleChangePin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPin.length < 4) {
+      alert('PIN minimal harus 4 digit angka/karakter!');
+      return;
+    }
+    if (newPin !== confirmPin) {
+      alert('Konfirmasi PIN baru tidak cocok!');
+      return;
+    }
+    setAdminPin(newPin);
+    setNewPin('');
+    setConfirmPin('');
+    setAuthSuccessMsg('PIN Admin berhasil diperbarui!');
+    setTimeout(() => setAuthSuccessMsg(''), 4000);
   };
 
   // Google Sheets Save
@@ -272,23 +359,6 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     }
   };
 
-  // Change PIN
-  const handleChangePin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPin.length < 4) {
-      alert('PIN minimal 4 angka!');
-      return;
-    }
-    if (newPin !== confirmPin) {
-      alert('Konfirmasi PIN baru tidak cocok!');
-      return;
-    }
-    setAdminPin(newPin);
-    setNewPin('');
-    setConfirmPin('');
-    alert('PIN Admin berhasil diperbarui!');
-  };
-
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div className="bg-slate-900 border border-emerald-800 text-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
@@ -314,39 +384,148 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           </button>
         </div>
 
-        {/* Check Password PIN if not authenticated */}
+        {/* Check Password PIN or Email/Password if not authenticated */}
         {!isAuthenticated ? (
-          <div className="p-8 sm:p-12 text-center space-y-6 max-w-md mx-auto my-auto">
-            <div className="w-16 h-16 bg-emerald-900 text-amber-400 rounded-full flex items-center justify-center mx-auto border-2 border-amber-400/50 shadow-xl">
-              <Lock className="w-8 h-8" />
-            </div>
-            <div>
-              <h4 className="text-xl font-black text-white">Masukkan PIN Admin</h4>
-              <p className="text-xs text-slate-400 mt-1">
-                Akses aman untuk mengedit produk, santri, statistik, dan koneksi Google Sheets.
+          <div className="p-6 sm:p-10 max-w-lg mx-auto my-auto w-full space-y-6">
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 bg-emerald-950 text-amber-400 rounded-2xl flex items-center justify-center mx-auto border border-emerald-700 shadow-xl">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <h4 className="text-xl font-black text-white">Login Admin Kios Sedekah</h4>
+              <p className="text-xs text-slate-400">
+                Pilih metode masuk untuk mengelola katalog, data santri, dan integrasi Google Sheets.
               </p>
             </div>
 
-            <form onSubmit={handlePinSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="password"
-                  value={inputPin}
-                  onChange={(e) => setInputPin(e.target.value)}
-                  placeholder="Masukkan PIN (Default: 123456)"
-                  className="w-full text-center tracking-widest text-xl px-4 py-3 bg-slate-800 border border-emerald-700 rounded-xl text-amber-300 focus:outline-none focus:border-amber-400"
-                  autoFocus
-                />
-                {pinError && <p className="text-xs text-red-400 mt-2 font-semibold">{pinError}</p>}
-              </div>
-
+            {/* Login Method Tabs */}
+            <div className="flex p-1 bg-slate-800/80 rounded-xl border border-slate-700">
               <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-sm shadow-lg transition-all"
+                type="button"
+                onClick={() => {
+                  setLoginMode('email');
+                  setAuthError('');
+                }}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 ${
+                  loginMode === 'email'
+                    ? 'bg-amber-400 text-emerald-950 shadow'
+                    : 'text-slate-400 hover:text-white'
+                }`}
               >
-                Masuk Ke Panel Admin
+                <Mail className="w-4 h-4" />
+                <span>Email & Password</span>
               </button>
-            </form>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoginMode('pin');
+                  setAuthError('');
+                }}
+                className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center space-x-2 ${
+                  loginMode === 'pin'
+                    ? 'bg-amber-400 text-emerald-950 shadow'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Lock className="w-4 h-4" />
+                <span>PIN Cepat</span>
+              </button>
+            </div>
+
+            {/* EMAIL & PASSWORD LOGIN FORM */}
+            {loginMode === 'email' ? (
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Email Admin</label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <input
+                      type="email"
+                      required
+                      value={inputEmail}
+                      onChange={(e) => setInputEmail(e.target.value)}
+                      placeholder="admin@kiossedekah.com"
+                      className="w-full pl-9 pr-4 py-2.5 bg-slate-800 border border-emerald-800/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">Password Admin</label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3.5" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={inputPassword}
+                      onChange={(e) => setInputPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full pl-9 pr-10 py-2.5 bg-slate-800 border border-emerald-800/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 font-medium"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-slate-400 hover:text-amber-400"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {authError && (
+                  <div className="p-3 bg-red-950/80 border border-red-800 rounded-xl text-xs text-red-300 font-medium">
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center space-x-2"
+                >
+                  <UserCheck className="w-4 h-4" />
+                  <span>Masuk dengan Email & Password</span>
+                </button>
+              </form>
+            ) : (
+              /* PIN LOGIN FORM */
+              <form onSubmit={handlePinSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-300 mb-1 text-center">Masukkan 6-Digit PIN Admin</label>
+                  <input
+                    type="password"
+                    value={inputPin}
+                    onChange={(e) => setInputPin(e.target.value)}
+                    placeholder="PIN (Default: 123456)"
+                    className="w-full text-center tracking-widest text-xl px-4 py-3 bg-slate-800 border border-emerald-700 rounded-xl text-amber-300 focus:outline-none focus:border-amber-400 font-bold"
+                    autoFocus
+                  />
+                  {authError && (
+                    <div className="p-3 bg-red-950/80 border border-red-800 rounded-xl text-xs text-red-300 font-medium mt-3 text-center">
+                      {authError}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs shadow-lg transition-all flex items-center justify-center space-x-2"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>Masuk dengan PIN</span>
+                </button>
+              </form>
+            )}
+
+            {/* Quick Helper Button for Auto-fill Credentials */}
+            <div className="pt-2 border-t border-slate-800 text-center">
+              <button
+                type="button"
+                onClick={handleAutoFillDefault}
+                className="text-[11px] text-amber-400 hover:underline font-semibold"
+              >
+                ⚡ Isikan Akses Default Demo ({loginMode === 'email' ? 'Email: admin@kiossedekah.com | Pass: admin123' : 'PIN: 123456'})
+              </button>
+            </div>
           </div>
         ) : (
           /* Main Admin Interface */
@@ -746,26 +925,86 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 5: SETTINGS & CHANGE PIN */}
+              {/* TAB 5: SETTINGS & CREDENTIAL MANAGEMENT */}
               {activeAdminTab === 'settings' && (
                 <div className="space-y-6">
+                  {authSuccessMsg && (
+                    <div className="p-3 bg-emerald-950 border border-emerald-700 rounded-xl text-xs text-emerald-200 font-bold flex items-center space-x-2 shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>{authSuccessMsg}</span>
+                    </div>
+                  )}
+
+                  {/* Change Email & Password Form */}
+                  <form onSubmit={handleSaveCredentials} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+                    <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                      <Mail className="w-4 h-4 text-amber-400" />
+                      <span>Kelola Email & Password Admin</span>
+                    </h4>
+
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Email Admin</label>
+                        <input
+                          type="email"
+                          required
+                          value={editEmail}
+                          onChange={(e) => setEditEmail(e.target.value)}
+                          placeholder="admin@kiossedekah.com"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-medium focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-slate-300 font-semibold mb-1">Password Baru (Opsional)</label>
+                          <input
+                            type="password"
+                            value={editPassword}
+                            onChange={(e) => setEditPassword(e.target.value)}
+                            placeholder="Isi jika ingin mengubah password"
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-medium focus:outline-none focus:border-amber-400"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-300 font-semibold mb-1">Konfirmasi Password Baru</label>
+                          <input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Ulangi password baru"
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-medium focus:outline-none focus:border-amber-400"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow transition-all"
+                    >
+                      Simpan Perubahan Email & Password
+                    </button>
+                  </form>
+
                   {/* Change PIN Form */}
                   <form onSubmit={handleChangePin} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
                     <h4 className="font-bold text-sm text-white flex items-center space-x-2">
                       <Lock className="w-4 h-4 text-amber-400" />
-                      <span>Ubah PIN Akses Admin</span>
+                      <span>Ubah PIN Akses Admin Cepat</span>
                     </h4>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                       <div>
-                        <label className="block text-slate-300 font-semibold mb-1">PIN Baru (Min 4 Angka)</label>
+                        <label className="block text-slate-300 font-semibold mb-1">PIN Baru (Min 4 Digit)</label>
                         <input
                           type="password"
                           required
                           value={newPin}
                           onChange={(e) => setNewPin(e.target.value)}
-                          placeholder="Masukkan PIN baru"
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold"
+                          placeholder="Masukkan PIN baru (contoh: 123456)"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
                         />
                       </div>
 
@@ -777,14 +1016,14 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                           value={confirmPin}
                           onChange={(e) => setConfirmPin(e.target.value)}
                           placeholder="Ulangi PIN baru"
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
                         />
                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow"
+                      className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow transition-all"
                     >
                       Ubah PIN Admin
                     </button>
