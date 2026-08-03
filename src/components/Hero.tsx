@@ -19,6 +19,21 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
   const remainingKg = Math.max(0, goalKg - currentKg);
   const progressPercent = Math.min(100, Math.round((currentKg / goalKg) * 100));
 
+  const ctaPrimary = siteConfig?.heroCtaPrimary || 'Belanja Sembako Kios';
+  const ctaSecondary = siteConfig?.heroCtaSecondary || 'Kirim Paket Sedekah Santri';
+  const trust1 = siteConfig?.heroTrust1 || 'Beras & Sembako Fresh Terjamin';
+  const trust2 = siteConfig?.heroTrust2 || '42 Santri Tahfizh Binaan Mukim';
+  const trust3 = siteConfig?.heroTrust3 || 'Open Source GitHub Repositories';
+  const cardBadge = siteConfig?.heroCardBadge || 'Bekasi + Rumah Tahfizh';
+  const cardTitle = siteConfig?.heroCardTitle || "Rumah Tahfizh Al-Qur'an";
+  const cardSubtitle = siteConfig?.heroCardSubtitle || 'Mencetak Generasi Hafiz & Rabbani Bekasi';
+  const cardTarget = siteConfig?.heroCardTarget || '✨ Target 30 Juz Mutqin';
+  const cardGoalLabel = siteConfig?.heroCardGoalLabel || 'Kebutuhan Beras Santri Bulan Ini';
+  const feature1Title = siteConfig?.heroCardFeature1Title || 'Lihat Hafalan Santri';
+  const feature1Desc = siteConfig?.heroCardFeature1Desc || 'Setoran progress juz';
+  const feature2Title = siteConfig?.heroCardFeature2Title || 'Pendaftaran Santri';
+  const feature2Desc = siteConfig?.heroCardFeature2Desc || '100% Gratis Yatim & Dhuafa';
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-emerald-900 via-emerald-850 to-slate-900 text-white pt-8 pb-14 px-4 border-b border-emerald-800">
       {/* Subtle Background Geometric Pattern */}
@@ -64,7 +79,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-emerald-950 font-extrabold text-base shadow-lg hover:shadow-amber-500/20 transition-all flex items-center justify-center space-x-2 transform hover:-translate-y-0.5"
               >
                 <ShoppingBag className="w-5 h-5 text-emerald-950" />
-                <span>Belanja Sembako Kios</span>
+                <span>{ctaPrimary}</span>
                 <ArrowRight className="w-4 h-4 text-emerald-950 ml-1" />
               </button>
 
@@ -73,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
                 className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-base border border-emerald-600/80 shadow-md transition-all flex items-center justify-center space-x-2"
               >
                 <HeartHandshake className="w-5 h-5 text-amber-300" />
-                <span>Kirim Paket Sedekah Santri</span>
+                <span>{ctaSecondary}</span>
               </button>
             </div>
 
@@ -81,11 +96,11 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
             <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-4 text-xs text-emerald-200 font-medium border-t border-emerald-800/80">
               <div className="flex items-center space-x-1.5">
                 <ShieldCheck className="w-4 h-4 text-amber-400" />
-                <span>Beras & Sembako Fresh Terjamin</span>
+                <span>{trust1}</span>
               </div>
               <div className="flex items-center space-x-1.5">
                 <BookOpen className="w-4 h-4 text-amber-400" />
-                <span>42 Santri Tahfizh Binaan Mukim</span>
+                <span>{trust2}</span>
               </div>
               <a 
                 href={githubUrl}
@@ -94,7 +109,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
                 className="flex items-center space-x-1.5 hover:text-amber-300 transition-colors"
               >
                 <Github className="w-4 h-4 text-amber-400" />
-                <span>Open Source GitHub Repositories</span>
+                <span>{trust3}</span>
               </a>
             </div>
           </div>
@@ -105,7 +120,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
               
               {/* Badge Overlay */}
               <div className="absolute top-3 right-3 bg-amber-400 text-emerald-950 text-[11px] font-black uppercase px-2.5 py-1 rounded-full shadow">
-                Bekasi + Rumah Tahfizh
+                {cardBadge}
               </div>
 
               <div className="flex items-center space-x-4 mb-5">
@@ -115,10 +130,10 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
                   className="w-16 h-16 rounded-xl object-cover border-2 border-amber-400 shadow-md"
                 />
                 <div>
-                  <h3 className="font-bold text-lg text-white">Rumah Tahfizh Al-Qur'an</h3>
-                  <p className="text-xs text-emerald-200">Mencetak Generasi Hafiz & Rabbani Bekasi</p>
+                  <h3 className="font-bold text-lg text-white">{cardTitle}</h3>
+                  <p className="text-xs text-emerald-200">{cardSubtitle}</p>
                   <div className="flex items-center space-x-1 mt-1 text-xs text-amber-300 font-semibold">
-                    <span>✨ Target 30 Juz Mutqin</span>
+                    <span>{cardTarget}</span>
                   </div>
                 </div>
               </div>
@@ -126,7 +141,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
               {/* Progress Live Indicator */}
               <div className="bg-emerald-950/80 rounded-xl p-4 border border-emerald-800 mb-4 space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-emerald-300 font-medium">Kebutuhan Beras Santri Bulan Ini</span>
+                  <span className="text-emerald-300 font-medium">{cardGoalLabel}</span>
                   <span className="text-amber-300 font-bold">{currentKg} kg / {goalKg} kg</span>
                 </div>
                 <div className="w-full bg-emerald-900 rounded-full h-2.5 overflow-hidden">
@@ -146,15 +161,15 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
                   onClick={() => setActiveTab('tahfizh')}
                   className="bg-emerald-800/80 hover:bg-emerald-700 p-3 rounded-xl border border-emerald-700 text-left transition-colors"
                 >
-                  <div className="font-bold text-amber-300 mb-0.5">Lihat Hafalan Santri</div>
-                  <div className="text-[11px] text-emerald-200">Setoran progress juz</div>
+                  <div className="font-bold text-amber-300 mb-0.5">{feature1Title}</div>
+                  <div className="text-[11px] text-emerald-200">{feature1Desc}</div>
                 </button>
                 <button 
                   onClick={() => setActiveTab('pendaftaran')}
                   className="bg-emerald-800/80 hover:bg-emerald-700 p-3 rounded-xl border border-emerald-700 text-left transition-colors"
                 >
-                  <div className="font-bold text-amber-300 mb-0.5">Pendaftaran Santri</div>
-                  <div className="text-[11px] text-emerald-200">100% Gratis Yatim & Dhuafa</div>
+                  <div className="font-bold text-amber-300 mb-0.5">{feature2Title}</div>
+                  <div className="text-[11px] text-emerald-200">{feature2Desc}</div>
                 </button>
               </div>
 
