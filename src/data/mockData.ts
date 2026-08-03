@@ -1,4 +1,27 @@
-import { SembakoProduct, Santri, ProgramTahfizh, DonationRecord } from '../types';
+import { SembakoProduct, Santri, ProgramTahfizh, DonationRecord, SiteConfig } from '../types';
+
+export const INITIAL_SITE_CONFIG: SiteConfig = {
+  appName: 'KIOS SEDEKAH BEKASI',
+  appSubtitle: '& Rumah Tahfizh',
+  aboutTagline: 'Belanja Sembako Sambil Membina Para Penghafal Al-Qur\'an',
+  announcementText: '100% Keuntungan Penjualan Sembako Kios Dialokasikan untuk Beasiswa & Beras Santri Tahfizh Al-Qur\'an',
+  heroBadgeText: 'Gerakan Muamalah Berkah & Dakwah Bekasi',
+  heroTitleMain: 'Belanja Sembako Sehari-hari,',
+  heroTitleHighlight: 'Sekaligus Membina Santri Tahfizh',
+  heroSubtitle: 'Selamat datang di Kios Sedekah Bekasi & Rumah Tahfizh Al-Qur\'an. Setiap gram beras & kebutuhan dapur yang Anda beli turut membiayai makan gizi, tempat tinggal, dan hafalan santri yatim dhuafa.',
+  heroBerasGoalKg: 600,
+  heroBerasCurrentKg: 450,
+  waNumberDisplay: '0812-3456-7890',
+  waNumberDigits: '6281234567890',
+  organizationAddress: 'Jl. Masjid Al-Ikhlas No. 45, RT 03/RW 07, Jatiasih, Kota Bekasi, Jawa Barat 17423',
+  bankBsiAccount: '7123-4567-89',
+  bankBsiName: 'Bank Syariah Indonesia (BSI)',
+  bankAccountHolder: 'Kios Sedekah Bekasi & Rumah Tahfizh',
+  qrisImageUrl: 'https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?auto=format&fit=crop&q=80&w=600',
+  githubRepoUrl: 'https://github.com/kiossedekahbekasi/rumahtahfiz-nurula-laa',
+  footerDescription: 'Gerakan sosial muamalah berbasis pemberdayaan toko sembako murah untuk pemenuhan kebutuhan gizi, tempat tinggal, dan beasiswa 100% gratis santri penghafal Al-Qur\'an di Bekasi.',
+};
+
 
 export const INITIAL_PRODUCTS: SembakoProduct[] = [
   {
