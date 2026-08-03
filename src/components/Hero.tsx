@@ -1,12 +1,24 @@
 import React from 'react';
 import { ShoppingBag, HeartHandshake, BookOpen, ShieldCheck, Sparkles, ArrowRight, Github, ExternalLink } from 'lucide-react';
+import { SiteConfig } from '../types';
 
 interface HeroProps {
   setActiveTab: (tab: 'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator') => void;
   onOpenSedekahPackage: () => void;
+  siteConfig?: SiteConfig;
 }
 
-export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }) => {
+export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, siteConfig }) => {
+  const badgeText = siteConfig?.heroBadgeText || 'Gerakan Muamalah Berkah & Dakwah Bekasi';
+  const titleMain = siteConfig?.heroTitleMain || 'Belanja Sembako Sehari-hari,';
+  const titleHighlight = siteConfig?.heroTitleHighlight || 'Sekaligus Membina Santri Tahfizh';
+  const subtitle = siteConfig?.heroSubtitle || "Selamat datang di Kios Sedekah Bekasi & Rumah Tahfizh Al-Qur'an. Setiap gram beras & kebutuhan dapur yang Anda beli turut membiayai makan gizi, tempat tinggal, dan hafalan santri yatim dhuafa.";
+  const githubUrl = siteConfig?.githubRepoUrl || 'https://github.com/kiossedekahbekasi?tab=repositories';
+  const goalKg = siteConfig?.heroBerasGoalKg || 600;
+  const currentKg = siteConfig?.heroBerasCurrentKg || 450;
+  const remainingKg = Math.max(0, goalKg - currentKg);
+  const progressPercent = Math.min(100, Math.round((currentKg / goalKg) * 100));
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-emerald-900 via-emerald-850 to-slate-900 text-white pt-8 pb-14 px-4 border-b border-emerald-800">
       {/* Subtle Background Geometric Pattern */}
@@ -20,10 +32,10 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
               <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-800/80 border border-amber-400/40 text-amber-300 text-xs sm:text-sm font-semibold shadow-inner">
                 <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Gerakan Muamalah Berkah & Dakwah Bekasi</span>
+                <span>{badgeText}</span>
               </div>
               <a
-                href="https://github.com/kiossedekahbekasi?tab=repositories"
+                href={githubUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-900 border border-amber-400/40 text-amber-300 hover:text-white text-xs font-semibold shadow-inner transition-colors"
@@ -35,14 +47,14 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-              Belanja Sembako Sehari-hari, <br />
+              {titleMain} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200">
-                Sekaligus Membina Santri Tahfizh
+                {titleHighlight}
               </span>
             </h1>
 
             <p className="text-emerald-100 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
-              Selamat datang di <strong className="text-amber-300">Kios Sedekah Bekasi</strong> & <strong className="text-amber-300">Rumah Tahfizh Al-Qur'an</strong>. Setiap gram beras & kebutuhan dapur yang Anda beli turut membiayai makan gizi, tempat tinggal, dan hafalan santri yatim dhuafa.
+              {subtitle}
             </p>
 
             {/* Quick Action CTAs */}
@@ -76,7 +88,7 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }
                 <span>42 Santri Tahfizh Binaan Mukim</span>
               </div>
               <a 
-                href="https://github.com/kiossedekahbekasi?tab=repositories"
+                href={githubUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center space-x-1.5 hover:text-amber-300 transition-colors"
@@ -115,13 +127,16 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }
               <div className="bg-emerald-950/80 rounded-xl p-4 border border-emerald-800 mb-4 space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-emerald-300 font-medium">Kebutuhan Beras Santri Bulan Ini</span>
-                  <span className="text-amber-300 font-bold">450 kg / 600 kg</span>
+                  <span className="text-amber-300 font-bold">{currentKg} kg / {goalKg} kg</span>
                 </div>
                 <div className="w-full bg-emerald-900 rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-gradient-to-r from-amber-500 to-amber-300 h-2.5 rounded-full w-[75%]" />
+                  <div 
+                    className="bg-gradient-to-r from-amber-500 to-amber-300 h-2.5 rounded-full transition-all duration-500" 
+                    style={{ width: `${progressPercent}%` }}
+                  />
                 </div>
                 <p className="text-[11px] text-emerald-300/90 text-right">
-                  Tersisa 150 kg lagi untuk tercapai
+                  Tersisa {remainingKg} kg lagi untuk tercapai
                 </p>
               </div>
 
@@ -151,3 +166,4 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage }
     </div>
   );
 };
+
