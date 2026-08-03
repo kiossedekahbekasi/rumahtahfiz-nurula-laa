@@ -95,3 +95,26 @@ export interface Order {
   receiptNumber: string;
   status: 'proses' | 'siap' | 'tersalurkan';
 }
+
+export interface SiteConfig {
+  appName: string;
+  appSubtitle: string;
+  aboutTagline: string;
+  announcementText: string;
+  heroBadgeText: string;
+  heroTitleMain: string;
+  heroTitleHighlight: string;
+  heroSubtitle: string;
+  heroBerasGoalKg: number;
+  heroBerasCurrentKg: number;
+  waNumberDisplay: string;
+  waNumberDigits: string;
+  organizationAddress: string;
+  bankBsiAccount: string;
+  bankBsiName: string;
+  bankAccountHolder: string;
+  qrisImageUrl: string;
+  githubRepoUrl: string;
+  footerDescription: string;
+}
+
