@@ -1,12 +1,25 @@
 import React from 'react';
 import { MOCK_FAQS } from '../data/mockData';
 import { MapPin, Phone, Clock, ShieldCheck, HeartHandshake, HelpCircle, Github, ExternalLink, Code2, KeyRound } from 'lucide-react';
+import { SiteConfig } from '../types';
 
 interface FooterProps {
   onOpenAdmin?: () => void;
+  siteConfig?: SiteConfig;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, siteConfig }) => {
+  const appName = siteConfig?.appName || 'KIOS SEDEKAH BEKASI';
+  const appSubtitle = siteConfig?.appSubtitle || '& Rumah Tahfizh';
+  const footerDesc = siteConfig?.footerDescription || "Inisiatif Muamalah & Pendidikan Dakwah Terpadu. Belanja sembako berkualitas dengan harga jujur, menyokong langsung ratusan porsi nasi gizi dan beasiswa santri penghafal Al-Qur'an yatim & dhuafa.";
+  const address = siteConfig?.organizationAddress || 'Jl. Masjid Al-Ikhlas No. 45, RT 03/RW 07, Jatiasih, Kota Bekasi, Jawa Barat 17423';
+  const waDisplay = siteConfig?.waNumberDisplay || '0812-3456-7890';
+  const waDigits = siteConfig?.waNumberDigits || '6281234567890';
+  const bankAccount = siteConfig?.bankBsiAccount || '7123-4567-89';
+  const bankName = siteConfig?.bankBsiName || 'Bank Syariah Indonesia (BSI)';
+  const accountHolder = siteConfig?.bankAccountHolder || 'Kios Sedekah Bekasi & Rumah Tahfizh';
+  const githubUrl = siteConfig?.githubRepoUrl || 'https://github.com/kiossedekahbekasi?tab=repositories';
+
   return (
     <footer className="bg-emerald-950 text-emerald-100 border-t border-emerald-800 pt-12 pb-8">
       <div className="container mx-auto max-w-6xl px-4 space-y-12">
@@ -18,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               <HelpCircle className="w-4 h-4 text-amber-400" />
               <span>Pertanyaan Populer</span>
             </div>
-            <h3 className="text-2xl font-black text-white">FAQ Kios Sedekah Bekasi & Rumah Tahfizh</h3>
+            <h3 className="text-2xl font-black text-white">FAQ {appName} {appSubtitle}</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -44,18 +57,18 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h4 className="font-extrabold text-base text-white">Kios Sedekah Bekasi Repositories</h4>
+                <h4 className="font-extrabold text-base text-white">{appName} Repositories</h4>
                 <span className="text-[10px] bg-amber-400 text-emerald-950 px-2 py-0.5 rounded-full font-black uppercase">
                   Open Source
                 </span>
               </div>
               <p className="text-xs text-emerald-200 mt-0.5">
-                Akses sistem open source, repositori, dan transparansi ekosistem digital Kios Sedekah Bekasi di GitHub.
+                Akses sistem open source, repositori, dan transparansi ekosistem digital {appName} di GitHub.
               </p>
             </div>
           </div>
           <a
-            href="https://github.com/kiossedekahbekasi?tab=repositories"
+            href={githubUrl}
             target="_blank"
             rel="noreferrer"
             className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-md flex-shrink-0"
@@ -75,14 +88,14 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               <div className="w-8 h-8 rounded-lg bg-amber-400 text-emerald-950 flex items-center justify-center font-bold text-lg">
                 🕌
               </div>
-              <span className="font-extrabold text-lg text-white">KIOS SEDEKAH BEKASI</span>
+              <span className="font-extrabold text-lg text-white">{appName}</span>
             </div>
             <p className="text-emerald-300 leading-relaxed">
-              Inisiatif Muamalah & Pendidikan Dakwah Terpadu Kota Bekasi. Belanja sembako berkualitas dengan harga jujur, menyokong langsung ratusan porsi nasi gizi dan beasiswa santri penghafal Al-Qur'an yatim & dhuafa.
+              {footerDesc}
             </p>
             <div className="pt-1 flex items-center space-x-2 text-amber-300 font-semibold text-[11px]">
               <Github className="w-4 h-4 text-amber-400" />
-              <span>GitHub Org: <a href="https://github.com/kiossedekahbekasi" target="_blank" rel="noreferrer" className="underline hover:text-white">github.com/kiossedekahbekasi</a></span>
+              <span>GitHub Repositories: <a href={githubUrl} target="_blank" rel="noreferrer" className="underline hover:text-white">{githubUrl}</a></span>
             </div>
             <div className="pt-1 text-[11px] text-amber-300 font-semibold">
               ✨ 100% Keuntungan Bersih Dialokasikan Untuk Kegiatan Sosial & Tahfizh
@@ -96,11 +109,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             </h4>
             <div className="flex items-start space-x-2 text-emerald-200">
               <MapPin className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-              <span>Jl. Masjid Al-Barokah No. 77, Kompleks Kios Sedekah & Rumah Tahfizh, Bekasi, Jawa Barat, Indonesia</span>
+              <span>{address}</span>
             </div>
             <div className="flex items-center space-x-2 text-emerald-200">
               <Phone className="w-4 h-4 text-amber-400 flex-shrink-0" />
-              <span>WhatsApp Hotline Bekasi: 0812-3456-7890 / 0857-1122-3344</span>
+              <span>WhatsApp: <a href={`https://wa.me/${waDigits}`} target="_blank" rel="noreferrer" className="underline hover:text-amber-300">{waDisplay}</a></span>
             </div>
             <div className="flex items-center space-x-2 text-emerald-200">
               <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
@@ -114,9 +127,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
               Rekening Infaq Resmi
             </h4>
             <div className="bg-emerald-900 p-3 rounded-xl border border-emerald-800 space-y-1">
-              <span className="block font-bold text-white">BSI (Bank Syariah Indonesia)</span>
-              <span className="block font-mono text-amber-300 font-extrabold">7182-9304-11</span>
-              <span className="block text-[10px] text-emerald-300">a.n. YAYASAN KIOS SEDEKAH BEKASI</span>
+              <span className="block font-bold text-white">{bankName}</span>
+              <span className="block font-mono text-amber-300 font-extrabold">{bankAccount}</span>
+              <span className="block text-[10px] text-emerald-300">a.n. {accountHolder}</span>
             </div>
           </div>
 
@@ -125,7 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
         {/* Bottom Copyright */}
         <div className="pt-6 border-t border-emerald-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-emerald-400/80 gap-2">
           <div>
-            © {new Date().getFullYear()} Kios Sedekah Bekasi & Rumah Tahfizh Al-Qur'an. All rights reserved.
+            © {new Date().getFullYear()} {appName} {appSubtitle}. All rights reserved.
           </div>
           <div className="flex items-center space-x-4">
             {onOpenAdmin && (
@@ -139,7 +152,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
             )}
             <span>•</span>
             <a 
-              href="https://github.com/kiossedekahbekasi?tab=repositories" 
+              href={githubUrl} 
               target="_blank" 
               rel="noreferrer" 
               className="hover:text-amber-300 flex items-center space-x-1"
@@ -158,3 +171,4 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
     </footer>
   );
 };
+
