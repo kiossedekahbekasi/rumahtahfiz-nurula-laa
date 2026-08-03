@@ -5,9 +5,22 @@ import { BarChart3, ShieldCheck, HeartHandshake, Award, Users, CheckCircle, File
 
 interface TransparansiLaporanProps {
   donations: DonationRecord[];
+  stats?: {
+    berasKg: number;
+    santriCount: number;
+    porsiMakan: number;
+    danaTersalurkan: number;
+  };
 }
 
-export const TransparansiLaporan: React.FC<TransparansiLaporanProps> = ({ donations }) => {
+export const TransparansiLaporan: React.FC<TransparansiLaporanProps> = ({ donations, stats }) => {
+  const displayStats = stats || {
+    berasKg: MOCK_TRANSPARENCY_STATS.totalSembakoTerjualKg,
+    santriCount: MOCK_TRANSPARENCY_STATS.santriPenerimaBeasiswa,
+    porsiMakan: MOCK_TRANSPARENCY_STATS.porsiMakanBergiziDisalurkan,
+    danaTersalurkan: MOCK_TRANSPARENCY_STATS.totalDanaTerhimpunRp,
+  };
+
   return (
     <section className="py-12 bg-slate-900 text-white min-h-[600px] border-b border-slate-800">
       <div className="container mx-auto max-w-6xl px-4">
@@ -31,7 +44,7 @@ export const TransparansiLaporan: React.FC<TransparansiLaporanProps> = ({ donati
           <div className="bg-emerald-950 p-5 rounded-2xl border border-emerald-800 text-center space-y-1 shadow-lg">
             <div className="text-amber-400 font-extrabold text-xs uppercase">Beras & Sembako Terjual</div>
             <div className="text-2xl sm:text-3xl font-black text-white">
-              {MOCK_TRANSPARENCY_STATS.totalSembakoTerjualKg.toLocaleString('id-ID')} <span className="text-sm font-normal text-emerald-300">kg</span>
+              {displayStats.berasKg.toLocaleString('id-ID')} <span className="text-sm font-normal text-emerald-300">kg</span>
             </div>
             <div className="text-[11px] text-emerald-300">Dipasok dari Petani Binaan</div>
           </div>
@@ -39,7 +52,7 @@ export const TransparansiLaporan: React.FC<TransparansiLaporanProps> = ({ donati
           <div className="bg-emerald-950 p-5 rounded-2xl border border-emerald-800 text-center space-y-1 shadow-lg">
             <div className="text-amber-400 font-extrabold text-xs uppercase">Dana Terhimpun & Disalurkan</div>
             <div className="text-xl sm:text-2xl font-black text-white">
-              Rp {(MOCK_TRANSPARENCY_STATS.totalDanaTerhimpunRp / 1000000).toFixed(1)} <span className="text-sm font-normal text-emerald-300">Juta</span>
+              Rp {(displayStats.danaTersalurkan / 1000000).toFixed(1)} <span className="text-sm font-normal text-emerald-300">Juta</span>
             </div>
             <div className="text-[11px] text-emerald-300">100% Alokasi Keuntungan</div>
           </div>
@@ -47,17 +60,17 @@ export const TransparansiLaporan: React.FC<TransparansiLaporanProps> = ({ donati
           <div className="bg-emerald-950 p-5 rounded-2xl border border-emerald-800 text-center space-y-1 shadow-lg">
             <div className="text-amber-400 font-extrabold text-xs uppercase">Santri Beasiswa Mukim</div>
             <div className="text-2xl sm:text-3xl font-black text-white">
-              {MOCK_TRANSPARENCY_STATS.santriPenerimaBeasiswa} <span className="text-sm font-normal text-emerald-300">Santri</span>
+              {displayStats.santriCount} <span className="text-sm font-normal text-emerald-300">Santri</span>
             </div>
             <div className="text-[11px] text-emerald-300">Makan & Fasilitas 100% Gratis</div>
           </div>
 
           <div className="bg-emerald-950 p-5 rounded-2xl border border-emerald-800 text-center space-y-1 shadow-lg">
-            <div className="text-amber-400 font-extrabold text-xs uppercase">Alumni Hafiz 30 Juz</div>
+            <div className="text-amber-400 font-extrabold text-xs uppercase">Porsi Makan Bergizi Santri</div>
             <div className="text-2xl sm:text-3xl font-black text-white">
-              {MOCK_TRANSPARENCY_STATS.alumniHafiz30Juz} <span className="text-sm font-normal text-emerald-300">Orang</span>
+              {displayStats.porsiMakan.toLocaleString('id-ID')} <span className="text-sm font-normal text-emerald-300">Porsi</span>
             </div>
-            <div className="text-[11px] text-emerald-300">Telah Mengabdi di Masyarakat</div>
+            <div className="text-[11px] text-emerald-300">Disalurkan dari Hasil Kios</div>
           </div>
         </div>
 

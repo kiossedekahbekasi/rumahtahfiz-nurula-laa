@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   SembakoProduct, 
   CartItem, 
   ProductCategory, 
-  DonationRecord 
+  DonationRecord,
+  Santri 
 } from './types';
 import { 
   INITIAL_PRODUCTS, 
   INITIAL_SANTRI, 
   PROGRAM_TAHFIZH_LIST, 
-  INITIAL_DONATIONS 
+  INITIAL_DONATIONS,
+  MOCK_TRANSPARENCY_STATS
 } from './data/mockData';
 
 import { Navbar } from './components/Navbar';
@@ -22,23 +24,83 @@ import { TransparansiLaporan } from './components/TransparansiLaporan';
 import { ZakatKalkulator } from './components/ZakatKalkulator';
 import { CartDrawer } from './components/CartDrawer';
 import { AiAssistantModal } from './components/AiAssistantModal';
+import { AdminPanelModal } from './components/AdminPanelModal';
 import { Footer } from './components/Footer';
+
+// Local Storage Keys
+const STORAGE_KEY_PRODUCTS = 'ksb_products_data_v1';
+const STORAGE_KEY_SANTRI = 'ksb_santri_data_v1';
+const STORAGE_KEY_DONATIONS = 'ksb_donations_data_v1';
+const STORAGE_KEY_STATS = 'ksb_stats_data_v1';
+const STORAGE_KEY_ADMIN_PIN = 'ksb_admin_pin_code';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator'>('kios');
   
-  // App Data State
-  const [products] = useState<SembakoProduct[]>(INITIAL_PRODUCTS);
-  const [santriList] = useState(INITIAL_SANTRI);
-  const [programs] = useState(PROGRAM_TAHFIZH_LIST);
-  const [donations, setDonations] = useState<DonationRecord[]>(INITIAL_DONATIONS);
+  // App Data State (Initialized from LocalStorage if present)
+  const [products, setProducts] = useState<SembakoProduct[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
+    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
 
-  // Cart & Filters State
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [santriList, setSantriList] = useState<Santri[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_SANTRI);
+    return saved ? JSON.parse(saved) : INITIAL_SANTRI;
+  });
+
+  const [programs] = useState(PROGRAM_TAHFIZH_LIST);
+
+  const [donations, setDonations] = useState<DonationRecord[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_DONATIONS);
+    return saved ? JSON.parse(saved) : INITIAL_DONATIONS;
+  });
+
+  const [stats, setStats] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_STATS);
+    return saved ? JSON.parse(saved) : {
+      berasKg: MOCK_TRANSPARENCY_STATS.totalSembakoTerjualKg,
+      santriCount: MOCK_TRANSPARENCY_STATS.santriPenerimaBeasiswa,
+      porsiMakan: MOCK_TRANSPARENCY_STATS.porsiMakanBergiziDisalurkan,
+      danaTersalurkan: MOCK_TRANSPARENCY_STATS.totalDanaTerhimpunRp,
+    };
+  });
+
+  const [adminPin, setAdminPin] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_ADMIN_PIN) || '123456';
+  });
+
+  // Modals & Drawer State
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
+
+  // Filters State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory>('semua');
+
+  // Cart State
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  // Sync Data to LocalStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_SANTRI, JSON.stringify(santriList));
+  }, [santriList]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_DONATIONS, JSON.stringify(donations));
+  }, [donations]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
+  }, [stats]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_ADMIN_PIN, adminPin);
+  }, [adminPin]);
 
   // Total items in cart
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -122,6 +184,25 @@ export default function App() {
     setIsCartOpen(true);
   };
 
+  // Reset to initial factory data
+  const handleResetData = () => {
+    setProducts(INITIAL_PRODUCTS);
+    setSantriList(INITIAL_SANTRI);
+    setDonations(INITIAL_DONATIONS);
+    setStats({
+      berasKg: MOCK_TRANSPARENCY_STATS.totalSembakoTerjualKg,
+      santriCount: MOCK_TRANSPARENCY_STATS.santriPenerimaBeasiswa,
+      porsiMakan: MOCK_TRANSPARENCY_STATS.porsiMakanBergiziDisalurkan,
+      danaTersalurkan: MOCK_TRANSPARENCY_STATS.totalDanaTerhimpunRp,
+    });
+    setAdminPin('123456');
+    localStorage.removeItem(STORAGE_KEY_PRODUCTS);
+    localStorage.removeItem(STORAGE_KEY_SANTRI);
+    localStorage.removeItem(STORAGE_KEY_DONATIONS);
+    localStorage.removeItem(STORAGE_KEY_STATS);
+    localStorage.removeItem(STORAGE_KEY_ADMIN_PIN);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-amber-400 selection:text-emerald-950">
       
@@ -132,13 +213,14 @@ export default function App() {
         cartCount={cartCount}
         setIsCartOpen={setIsCartOpen}
         setIsAiOpen={setIsAiOpen}
+        setIsAdminOpen={setIsAdminOpen}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
 
       {/* Main Content Area */}
       <main className="flex-1">
-        {/* Hero Section (Always visible or highlighted) */}
+        {/* Hero Section */}
         <Hero
           setActiveTab={setActiveTab}
           onOpenSedekahPackage={() => {
@@ -177,13 +259,13 @@ export default function App() {
         {activeTab === 'pendaftaran' && (
           <PendaftaranSantri
             onSuccess={() => {
-              // Scroll or provide confirmation
+              // Scroll or confirmation
             }}
           />
         )}
 
         {activeTab === 'transparansi' && (
-          <TransparansiLaporan donations={donations} />
+          <TransparansiLaporan donations={donations} stats={stats} />
         )}
 
         {activeTab === 'kalkulator' && (
@@ -192,7 +274,7 @@ export default function App() {
       </main>
 
       {/* Footer & FAQ */}
-      <Footer />
+      <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
 
       {/* Shopping Cart Drawer */}
       <CartDrawer
@@ -209,6 +291,23 @@ export default function App() {
       <AiAssistantModal
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
+      />
+
+      {/* Admin Panel Modal */}
+      <AdminPanelModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        products={products}
+        setProducts={setProducts}
+        santriList={santriList}
+        setSantriList={setSantriList}
+        donations={donations}
+        setDonations={setDonations}
+        stats={stats}
+        setStats={setStats}
+        adminPin={adminPin}
+        setAdminPin={setAdminPin}
+        onResetData={handleResetData}
       />
 
     </div>

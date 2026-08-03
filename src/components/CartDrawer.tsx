@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CartItem, Order } from '../types';
+import { sendToGoogleSheets, isAutoSyncEnabled } from '../lib/sheetsSync';
 import { 
   X, 
   Trash2, 
@@ -87,6 +88,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
     };
 
     setCompletedOrder(newOrder);
+
+    // Auto-sync order to Google Sheets if enabled
+    if (isAutoSyncEnabled()) {
+      sendToGoogleSheets('ORDER', newOrder).catch((err) => console.error('Order sync error:', err));
+    }
 
     // Celebration!
     confetti({

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RegistrationFormData } from '../types';
+import { sendToGoogleSheets, isAutoSyncEnabled } from '../lib/sheetsSync';
 import { GraduationCap, CheckCircle2, User, Phone, MapPin, Sparkles, Send, FileText } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -33,6 +34,13 @@ export const PendaftaranSantri: React.FC<PendaftaranSantriProps> = ({ onSuccess 
     const randomReg = 'REG-THFZ-' + Math.floor(100000 + Math.random() * 900000);
     setRegNumber(randomReg);
     setSubmittedData({ ...formData });
+
+    // Auto-sync registration to Google Sheets if enabled
+    if (isAutoSyncEnabled()) {
+      sendToGoogleSheets('SANTRI_REGISTRATION', { ...formData, regNumber: randomReg }).catch((err) =>
+        console.error('Santri registration sync error:', err)
+      );
+    }
 
     // Trigger celebration confetti!
     confetti({

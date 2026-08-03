@@ -1,8 +1,12 @@
 import React from 'react';
 import { MOCK_FAQS } from '../data/mockData';
-import { MapPin, Phone, Clock, ShieldCheck, HeartHandshake, HelpCircle, Github, ExternalLink, Code2 } from 'lucide-react';
+import { MapPin, Phone, Clock, ShieldCheck, HeartHandshake, HelpCircle, Github, ExternalLink, Code2, KeyRound } from 'lucide-react';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenAdmin?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenAdmin }) => {
   return (
     <footer className="bg-emerald-950 text-emerald-100 border-t border-emerald-800 pt-12 pb-8">
       <div className="container mx-auto max-w-6xl px-4 space-y-12">
@@ -124,6 +128,16 @@ export const Footer: React.FC = () => {
             © {new Date().getFullYear()} Kios Sedekah Bekasi & Rumah Tahfizh Al-Qur'an. All rights reserved.
           </div>
           <div className="flex items-center space-x-4">
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                className="text-amber-300 hover:text-white font-bold flex items-center space-x-1"
+              >
+                <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+                <span>Panel Admin & Google Sheets</span>
+              </button>
+            )}
+            <span>•</span>
             <a 
               href="https://github.com/kiossedekahbekasi?tab=repositories" 
               target="_blank" 

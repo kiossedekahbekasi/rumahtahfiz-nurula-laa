@@ -292,6 +292,7 @@ export const MOCK_TRANSPARENCY_STATS = {
   totalSembakoTerjualKg: 14850,
   totalDanaTerhimpunRp: 184500000,
   santriPenerimaBeasiswa: 42,
+  porsiMakanBergiziDisalurkan: 12500,
   keluargaDhuafaBinaan: 158,
   alumniHafiz30Juz: 19,
   alokasiKeuntunganPersen: 100, // 100% net profit allocated to social & santri support

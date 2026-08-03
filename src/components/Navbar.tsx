@@ -12,7 +12,9 @@ import {
   Sparkles,
   PhoneCall,
   Github,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  FileSpreadsheet
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -21,6 +23,7 @@ interface NavbarProps {
   cartCount: number;
   setIsCartOpen: (open: boolean) => void;
   setIsAiOpen: (open: boolean) => void;
+  setIsAdminOpen: (open: boolean) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
 }
@@ -31,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartCount,
   setIsCartOpen,
   setIsAiOpen,
+  setIsAdminOpen,
   searchQuery,
   setSearchQuery,
 }) => {
@@ -120,8 +124,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-4 h-4 text-emerald-300 absolute left-3 top-2.5" />
           </div>
 
-          {/* Action Buttons: Cart & AI Assistant & GitHub Link */}
+          {/* Action Buttons: Admin, Cart, AI Assistant, GitHub */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Admin Mode Toggle */}
+            <button
+              onClick={() => setIsAdminOpen(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-amber-300 border border-amber-400/50 text-xs font-bold transition-all hover:text-amber-200 shadow-sm"
+              title="Panel Kelola Admin & Google Sheets"
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span className="hidden md:inline">Panel Admin</span>
+            </button>
+
             {/* GitHub Repo Button */}
             <a
               href="https://github.com/kiossedekahbekasi?tab=repositories"
