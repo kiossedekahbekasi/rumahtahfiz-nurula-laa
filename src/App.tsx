@@ -4,14 +4,16 @@ import {
   CartItem, 
   ProductCategory, 
   DonationRecord,
-  Santri 
+  Santri,
+  SiteConfig
 } from './types';
 import { 
   INITIAL_PRODUCTS, 
   INITIAL_SANTRI, 
   PROGRAM_TAHFIZH_LIST, 
   INITIAL_DONATIONS,
-  MOCK_TRANSPARENCY_STATS
+  MOCK_TRANSPARENCY_STATS,
+  INITIAL_SITE_CONFIG
 } from './data/mockData';
 
 import { Navbar } from './components/Navbar';
@@ -35,6 +37,7 @@ const STORAGE_KEY_STATS = 'ksb_stats_data_v1';
 const STORAGE_KEY_ADMIN_PIN = 'ksb_admin_pin_code';
 const STORAGE_KEY_ADMIN_EMAIL = 'ksb_admin_email';
 const STORAGE_KEY_ADMIN_PASSWORD = 'ksb_admin_password';
+const STORAGE_KEY_SITE_CONFIG = 'ksb_site_config_v1';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator'>('kios');
@@ -43,6 +46,11 @@ export default function App() {
   const [products, setProducts] = useState<SembakoProduct[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_PRODUCTS);
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
+
+  const [siteConfig, setSiteConfig] = useState<SiteConfig>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_SITE_CONFIG);
+    return saved ? JSON.parse(saved) : INITIAL_SITE_CONFIG;
   });
 
   const [santriList, setSantriList] = useState<Santri[]>(() => {
@@ -119,6 +127,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_ADMIN_PASSWORD, adminPassword);
   }, [adminPassword]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_SITE_CONFIG, JSON.stringify(siteConfig));
+  }, [siteConfig]);
 
   // Total items in cart
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -205,6 +217,7 @@ export default function App() {
   // Reset to initial factory data
   const handleResetData = () => {
     setProducts(INITIAL_PRODUCTS);
+    setSiteConfig(INITIAL_SITE_CONFIG);
     setSantriList(INITIAL_SANTRI);
     setDonations(INITIAL_DONATIONS);
     setStats({
@@ -217,6 +230,7 @@ export default function App() {
     setAdminEmail('admin@kiossedekah.com');
     setAdminPassword('admin123');
     localStorage.removeItem(STORAGE_KEY_PRODUCTS);
+    localStorage.removeItem(STORAGE_KEY_SITE_CONFIG);
     localStorage.removeItem(STORAGE_KEY_SANTRI);
     localStorage.removeItem(STORAGE_KEY_DONATIONS);
     localStorage.removeItem(STORAGE_KEY_STATS);
@@ -238,6 +252,7 @@ export default function App() {
         setIsAdminOpen={setIsAdminOpen}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        siteConfig={siteConfig}
       />
 
       {/* Main Content Area */}
@@ -249,6 +264,7 @@ export default function App() {
             setActiveTab('kios');
             setSelectedCategory('paket_sedekah');
           }}
+          siteConfig={siteConfig}
         />
 
         {/* Dynamic View Sections based on Active Tab */}
@@ -296,7 +312,7 @@ export default function App() {
       </main>
 
       {/* Footer & FAQ */}
-      <Footer onOpenAdmin={() => setIsAdminOpen(true)} />
+      <Footer onOpenAdmin={() => setIsAdminOpen(true)} siteConfig={siteConfig} />
 
       {/* Shopping Cart Drawer */}
       <CartDrawer
@@ -333,6 +349,8 @@ export default function App() {
         setAdminEmail={setAdminEmail}
         adminPassword={adminPassword}
         setAdminPassword={setAdminPassword}
+        siteConfig={siteConfig}
+        setSiteConfig={setSiteConfig}
         onResetData={handleResetData}
       />
 
