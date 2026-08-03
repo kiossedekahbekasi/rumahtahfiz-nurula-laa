@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { SembakoProduct, Santri, DonationRecord, ProductCategory } from '../types';
+import React, { useState, useEffect } from 'react';
+import { SembakoProduct, Santri, DonationRecord, ProductCategory, SiteConfig } from '../types';
+import { INITIAL_SITE_CONFIG } from '../data/mockData';
 import { 
   getSheetsWebhookUrl, 
   setSheetsWebhookUrl, 
@@ -33,7 +34,10 @@ import {
   ShieldCheck,
   Eye,
   EyeOff,
-  UserCheck
+  UserCheck,
+  Type,
+  Globe,
+  Sliders
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -63,6 +67,8 @@ interface AdminPanelModalProps {
   setAdminEmail: (email: string) => void;
   adminPassword: string;
   setAdminPassword: (pass: string) => void;
+  siteConfig?: SiteConfig;
+  setSiteConfig?: React.Dispatch<React.SetStateAction<SiteConfig>>;
   onResetData: () => void;
 }
 
@@ -83,6 +89,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   setAdminEmail,
   adminPassword,
   setAdminPassword,
+  siteConfig,
+  setSiteConfig,
   onResetData,
 }) => {
   // Auth Login state
@@ -94,6 +102,24 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState('');
+
+  // Site Configuration Form State
+  const [siteForm, setSiteForm] = useState<SiteConfig>(siteConfig || INITIAL_SITE_CONFIG);
+
+  useEffect(() => {
+    if (siteConfig) {
+      setSiteForm(siteConfig);
+    }
+  }, [siteConfig]);
+
+  const handleSaveSiteConfig = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (setSiteConfig) {
+      setSiteConfig(siteForm);
+      setAuthSuccessMsg('Tulisan dan teks seluruh situs berhasil disimpan!');
+      setTimeout(() => setAuthSuccessMsg(''), 4000);
+    }
+  };
 
   // Settings Credentials State
   const [editEmail, setEditEmail] = useState(adminEmail);
@@ -275,9 +301,11 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     e.preventDefault();
     if (!productForm.name || !productForm.price) return;
 
+    let updatedProducts: SembakoProduct[] = [];
+
     if (editingProduct) {
-      setProducts((prev) =>
-        prev.map((item) => (item.id === editingProduct.id ? ({ ...item, ...productForm } as SembakoProduct) : item))
+      updatedProducts = products.map((item) =>
+        item.id === editingProduct.id ? ({ ...item, ...productForm } as SembakoProduct) : item
       );
     } else {
       const newProd: SembakoProduct = {
@@ -294,14 +322,26 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
         isSubsidy: productForm.isSubsidy,
         isSedekahSpecial: productForm.isSedekahSpecial,
       };
-      setProducts((prev) => [newProd, ...prev]);
+      updatedProducts = [newProd, ...products];
     }
+
+    setProducts(updatedProducts);
+
+    if (isAutoSyncEnabled()) {
+      sendToGoogleSheets('PRODUCT_UPDATE', updatedProducts).catch(console.error);
+    }
+
     setIsProductModalOpen(false);
   };
 
   const handleDeleteProduct = (id: string) => {
     if (confirm('Yakin ingin menghapus produk ini dari katalog?')) {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
+      const updatedProducts = products.filter((p) => p.id !== id);
+      setProducts(updatedProducts);
+
+      if (isAutoSyncEnabled()) {
+        sendToGoogleSheets('PRODUCT_UPDATE', updatedProducts).catch(console.error);
+      }
     }
   };
 
@@ -934,6 +974,214 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       <span>{authSuccessMsg}</span>
                     </div>
                   )}
+
+                  {/* Site Content & Global Text Editor */}
+                  <form onSubmit={handleSaveSiteConfig} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <Type className="w-4 h-4 text-amber-400" />
+                        <span>Pengaturan Seluruh Tulisan & Teks Situs</span>
+                      </h4>
+                      <span className="text-[10px] bg-amber-400 text-emerald-950 px-2.5 py-0.5 rounded-full font-extrabold uppercase">
+                        Kustomisasi Keseluruhan
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300">
+                      Ubah nama aplikasi, teks pengumuman running text, headline hero, kontak WhatsApp, nomor rekening, serta alamat yayasan secara langsung.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nama Utama Aplikasi / Brand</label>
+                        <input
+                          type="text"
+                          required
+                          value={siteForm.appName}
+                          onChange={(e) => setSiteForm({ ...siteForm, appName: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Sub-Judul / Label Lembaga</label>
+                        <input
+                          type="text"
+                          value={siteForm.appSubtitle}
+                          onChange={(e) => setSiteForm({ ...siteForm, appSubtitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Running Text Pengumuman Atas (Ticker)</label>
+                        <input
+                          type="text"
+                          value={siteForm.announcementText}
+                          onChange={(e) => setSiteForm({ ...siteForm, announcementText: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Badge Tagline Hero Atas</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroBadgeText}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBadgeText: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Tagline Motto Logo</label>
+                        <input
+                          type="text"
+                          value={siteForm.aboutTagline}
+                          onChange={(e) => setSiteForm({ ...siteForm, aboutTagline: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Utama Hero</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTitleMain}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTitleMain: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Sorotan Hero (Amber Gradient)</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTitleHighlight}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTitleHighlight: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Deskripsi Lengkap Hero</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.heroSubtitle}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroSubtitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Target Beras Bulanan (Kg)</label>
+                        <input
+                          type="number"
+                          value={siteForm.heroBerasGoalKg}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBerasGoalKg: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Beras Terkumpul Saat Ini (Kg)</label>
+                        <input
+                          type="number"
+                          value={siteForm.heroBerasCurrentKg}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBerasCurrentKg: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor WhatsApp Tampilan (cth: 0812-3456-7890)</label>
+                        <input
+                          type="text"
+                          value={siteForm.waNumberDisplay}
+                          onChange={(e) => setSiteForm({ ...siteForm, waNumberDisplay: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor WA Format Internasional (cth: 6281234567890)</label>
+                        <input
+                          type="text"
+                          value={siteForm.waNumberDigits}
+                          onChange={(e) => setSiteForm({ ...siteForm, waNumberDigits: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nama Bank Infaq (cth: Bank Syariah Indonesia (BSI))</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankBsiName}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankBsiName: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor Rekening Bank</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankBsiAccount}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankBsiAccount: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-mono font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Atas Nama Rekening</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankAccountHolder}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankAccountHolder: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">URL Repositori GitHub</label>
+                        <input
+                          type="url"
+                          value={siteForm.githubRepoUrl}
+                          onChange={(e) => setSiteForm({ ...siteForm, githubRepoUrl: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Alamat Lengkap Organisasi / Lembaga</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.organizationAddress}
+                          onChange={(e) => setSiteForm({ ...siteForm, organizationAddress: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Deskripsi Footer Bottom</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.footerDescription}
+                          onChange={(e) => setSiteForm({ ...siteForm, footerDescription: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs rounded-xl shadow transition-all flex items-center space-x-2"
+                    >
+                      <Type className="w-4 h-4 text-emerald-950" />
+                      <span>Simpan Perubahan Teks Seluruh Situs</span>
+                    </button>
+                  </form>
 
                   {/* Change Email & Password Form */}
                   <form onSubmit={handleSaveCredentials} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
