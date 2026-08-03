@@ -17,6 +17,8 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 
+import { SiteConfig } from '../types';
+
 interface NavbarProps {
   activeTab: 'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator';
   setActiveTab: (tab: 'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator') => void;
@@ -26,6 +28,7 @@ interface NavbarProps {
   setIsAdminOpen: (open: boolean) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  siteConfig?: SiteConfig;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -37,8 +40,18 @@ export const Navbar: React.FC<NavbarProps> = ({
   setIsAdminOpen,
   searchQuery,
   setSearchQuery,
+  siteConfig,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const announcementText = siteConfig?.announcementText || "100% Keuntungan Penjualan Sembako Kios Dialokasikan untuk Beasiswa & Beras Santri Tahfizh Al-Qur'an";
+  const appName = siteConfig?.appName || "KIOS SEDEKAH BEKASI";
+  const appSubtitle = siteConfig?.appSubtitle || "& Rumah Tahfizh";
+  const aboutTagline = siteConfig?.aboutTagline || "Belanja Sembako Sambil Membina Para Penghafal Al-Qur'an";
+  const waDisplay = siteConfig?.waNumberDisplay || "0812-3456-7890";
+  const waDigits = siteConfig?.waNumberDigits || "6281234567890";
+  const githubUrl = siteConfig?.githubRepoUrl || "https://github.com/kiossedekahbekasi?tab=repositories";
+
 
   const navItems = [
     { id: 'kios', label: 'Toko Sembako', icon: ShoppingBag },
@@ -58,12 +71,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               Program Berkah
             </span>
             <span className="truncate">
-              100% Keuntungan Penjualan Sembako Kios Dialokasikan untuk Beasiswa & Beras Santri Tahfizh Al-Qur'an
+              {announcementText}
             </span>
           </div>
           <div className="hidden sm:flex items-center space-x-4 text-emerald-300">
             <a 
-              href="https://github.com/kiossedekahbekasi?tab=repositories" 
+              href={githubUrl} 
               target="_blank" 
               rel="noreferrer"
               className="flex items-center space-x-1 text-amber-300 hover:text-amber-200 transition-colors bg-emerald-900/80 px-2.5 py-0.5 rounded border border-amber-400/30"
@@ -73,13 +86,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
             </a>
             <a 
-              href="https://wa.me/6281234567890" 
+              href={`https://wa.me/${waDigits}`} 
               target="_blank" 
               rel="noreferrer"
               className="flex items-center hover:text-amber-300 transition-colors"
             >
               <PhoneCall className="w-3 h-3 mr-1" />
-              WA Bekasi: 0812-3456-7890
+              WA: {waDisplay}
             </a>
           </div>
         </div>
@@ -100,14 +113,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div>
               <div className="flex items-center space-x-1.5">
                 <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-amber-300 transition-colors">
-                  KIOS SEDEKAH BEKASI
+                  {appName}
                 </span>
                 <span className="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-emerald-800/80 font-semibold border border-amber-400/30">
-                  & Rumah Tahfizh
+                  {appSubtitle}
                 </span>
               </div>
               <p className="text-[11px] text-emerald-200 hidden xs:block">
-                Belanja Sembako Sambil Membina Para Penghafal Al-Qur'an
+                {aboutTagline}
               </p>
             </div>
           </div>
