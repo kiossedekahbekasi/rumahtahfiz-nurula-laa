@@ -1,0 +1,6 @@
+{
+  "name": "Kios Sedekah & Rumah Tahfizh Al-Qur'an",
+  "description": "Website Toko Sembako Kios Sedekah & Rumah Tahfizh Al-Qur'an. Belanja Sembako Sambil Berinfaq, Paket Sembako Murah/Gratis Dhuafa & Santri, serta Informasi Program & Donasi Tahfizh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
