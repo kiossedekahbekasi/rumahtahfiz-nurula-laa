@@ -37,7 +37,9 @@ import {
   UserCheck,
   Type,
   Globe,
-  Sliders
+  Sliders,
+  Upload,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface AdminPanelModalProps {
@@ -118,6 +120,42 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       setSiteConfig(siteForm);
       setAuthSuccessMsg('Tulisan dan teks seluruh situs berhasil disimpan!');
       setTimeout(() => setAuthSuccessMsg(''), 4000);
+    }
+  };
+
+  // Image upload handler for Product photo from local device
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran foto terlalu besar! Maksimal 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setProductForm((prev) => ({ ...prev, image: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Image upload handler for Santri photo from local device
+  const handleSantriPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran foto terlalu besar! Maksimal 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setSantriForm((prev) => ({ ...prev, photo: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -1163,6 +1201,146 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                         />
                       </div>
 
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Tombol CTA Utama 1 (Kios)</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCtaPrimary || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCtaPrimary: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Tombol CTA Utama 2 (Sedekah)</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCtaSecondary || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCtaSecondary: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Teks Lencana Jaminan 1</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTrust1 || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTrust1: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Teks Lencana Jaminan 2</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTrust2 || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTrust2: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Teks Lencana Jaminan 3</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTrust3 || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTrust3: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Lencana Kartu Kanan (Badge Yellow)</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardBadge || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardBadge: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Kartu Rumah Tahfizh</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardTitle || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardTitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Sub-Judul Kartu Rumah Tahfizh</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardSubtitle || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardSubtitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Target Hafalan Kartu</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardTarget || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardTarget: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Label Kebutuhan Beras Bulanan</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardGoalLabel || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardGoalLabel: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Tombol Fitur Kartu 1</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardFeature1Title || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardFeature1Title: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Sub-Teks Fitur Kartu 1</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardFeature1Desc || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardFeature1Desc: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Tombol Fitur Kartu 2</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardFeature2Title || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardFeature2Title: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Sub-Teks Fitur Kartu 2</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroCardFeature2Desc || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroCardFeature2Desc: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
                       <div className="sm:col-span-2">
                         <label className="block text-slate-300 font-semibold mb-1">Deskripsi Footer Bottom</label>
                         <textarea
@@ -1397,14 +1575,51 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">URL Gambar Produk</label>
-                <input
-                  type="url"
-                  value={productForm.image || ''}
-                  onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                />
+                <label className="block text-slate-300 font-semibold mb-1">Foto Gambar Produk</label>
+                <div className="space-y-2">
+                  {productForm.image && (
+                    <div className="flex items-center space-x-3 bg-slate-800 p-2 rounded-xl border border-slate-700">
+                      <img
+                        src={productForm.image}
+                        alt="Preview Produk"
+                        className="w-14 h-14 object-cover rounded-lg border border-amber-400/50"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] text-amber-300 font-bold truncate">Foto Terpasang</p>
+                        <p className="text-[10px] text-slate-400 truncate">{productForm.image.startsWith('data:') ? 'Foto diunggah dari perangkat' : productForm.image}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setProductForm({ ...productForm, image: '' })}
+                        className="p-1.5 bg-red-950 hover:bg-red-900 text-red-300 rounded-lg text-xs"
+                        title="Hapus foto"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <label className="cursor-pointer bg-emerald-800 hover:bg-emerald-700 text-amber-300 px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 border border-emerald-600 shadow-sm transition-all">
+                      <Upload className="w-4 h-4 text-amber-300" />
+                      <span>Pilih Foto dari Perangkat</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProductImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <input
+                      type="url"
+                      value={productForm.image || ''}
+                      onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                      placeholder="Atau tempel URL Gambar (https://...)"
+                      className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -1556,14 +1771,51 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-semibold mb-1">URL Foto Santri</label>
-                <input
-                  type="url"
-                  value={santriForm.photo || ''}
-                  onChange={(e) => setSantriForm({ ...santriForm, photo: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white"
-                />
+                <label className="block text-slate-300 font-semibold mb-1">Foto Profile Santri</label>
+                <div className="space-y-2">
+                  {santriForm.photo && (
+                    <div className="flex items-center space-x-3 bg-slate-800 p-2 rounded-xl border border-slate-700">
+                      <img
+                        src={santriForm.photo}
+                        alt="Preview Santri"
+                        className="w-14 h-14 object-cover rounded-lg border border-amber-400/50"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] text-amber-300 font-bold truncate">Foto Santri Terpasang</p>
+                        <p className="text-[10px] text-slate-400 truncate">{santriForm.photo.startsWith('data:') ? 'Foto diunggah dari perangkat' : santriForm.photo}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSantriForm({ ...santriForm, photo: '' })}
+                        className="p-1.5 bg-red-950 hover:bg-red-900 text-red-300 rounded-lg text-xs"
+                        title="Hapus foto"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <label className="cursor-pointer bg-emerald-800 hover:bg-emerald-700 text-amber-300 px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 border border-emerald-600 shadow-sm transition-all">
+                      <Upload className="w-4 h-4 text-amber-300" />
+                      <span>Pilih Foto Santri dari Perangkat</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleSantriPhotoUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <input
+                      type="url"
+                      value={santriForm.photo || ''}
+                      onChange={(e) => setSantriForm({ ...santriForm, photo: e.target.value })}
+                      placeholder="Atau tempel URL Foto Santri (https://...)"
+                      className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-xs focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>
