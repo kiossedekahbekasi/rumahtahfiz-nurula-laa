@@ -1,1 +1,0 @@
-# rumahtahfiz-nurula-laa
