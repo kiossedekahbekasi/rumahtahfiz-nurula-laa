@@ -33,6 +33,8 @@ const STORAGE_KEY_SANTRI = 'ksb_santri_data_v1';
 const STORAGE_KEY_DONATIONS = 'ksb_donations_data_v1';
 const STORAGE_KEY_STATS = 'ksb_stats_data_v1';
 const STORAGE_KEY_ADMIN_PIN = 'ksb_admin_pin_code';
+const STORAGE_KEY_ADMIN_EMAIL = 'ksb_admin_email';
+const STORAGE_KEY_ADMIN_PASSWORD = 'ksb_admin_password';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator'>('kios');
@@ -69,6 +71,14 @@ export default function App() {
     return localStorage.getItem(STORAGE_KEY_ADMIN_PIN) || '123456';
   });
 
+  const [adminEmail, setAdminEmail] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_ADMIN_EMAIL) || 'admin@kiossedekah.com';
+  });
+
+  const [adminPassword, setAdminPassword] = useState(() => {
+    return localStorage.getItem(STORAGE_KEY_ADMIN_PASSWORD) || 'admin123';
+  });
+
   // Modals & Drawer State
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -101,6 +111,14 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_ADMIN_PIN, adminPin);
   }, [adminPin]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_ADMIN_EMAIL, adminEmail);
+  }, [adminEmail]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_ADMIN_PASSWORD, adminPassword);
+  }, [adminPassword]);
 
   // Total items in cart
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -196,11 +214,15 @@ export default function App() {
       danaTersalurkan: MOCK_TRANSPARENCY_STATS.totalDanaTerhimpunRp,
     });
     setAdminPin('123456');
+    setAdminEmail('admin@kiossedekah.com');
+    setAdminPassword('admin123');
     localStorage.removeItem(STORAGE_KEY_PRODUCTS);
     localStorage.removeItem(STORAGE_KEY_SANTRI);
     localStorage.removeItem(STORAGE_KEY_DONATIONS);
     localStorage.removeItem(STORAGE_KEY_STATS);
     localStorage.removeItem(STORAGE_KEY_ADMIN_PIN);
+    localStorage.removeItem(STORAGE_KEY_ADMIN_EMAIL);
+    localStorage.removeItem(STORAGE_KEY_ADMIN_PASSWORD);
   };
 
   return (
@@ -307,6 +329,10 @@ export default function App() {
         setStats={setStats}
         adminPin={adminPin}
         setAdminPin={setAdminPin}
+        adminEmail={adminEmail}
+        setAdminEmail={setAdminEmail}
+        adminPassword={adminPassword}
+        setAdminPassword={setAdminPassword}
         onResetData={handleResetData}
       />
 
