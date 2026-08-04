@@ -5,6 +5,7 @@ import {
   ProductCategory, 
   DonationRecord,
   Santri,
+  ProgramTahfizh,
   SiteConfig
 } from './types';
 import { 
@@ -96,6 +97,12 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState<SembakoProduct | null>(null);
+
+  const handleEditProduct = (product: SembakoProduct) => {
+    setProductToEdit(product);
+    setIsAdminOpen(true);
+  };
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -288,10 +295,12 @@ export default function App() {
               setSearchQuery={setSearchQuery}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
+              onEditProduct={handleEditProduct}
             />
             <PaketSedekahSection
               products={products}
               onAddToCart={handleAddToCart}
+              onEditProduct={handleEditProduct}
             />
           </>
         )}
@@ -369,6 +378,8 @@ export default function App() {
         siteConfig={siteConfig}
         setSiteConfig={setSiteConfig}
         onResetData={handleResetData}
+        productToEdit={productToEdit}
+        onClearProductToEdit={() => setProductToEdit(null)}
       />
 
     </div>
