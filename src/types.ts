@@ -121,6 +121,31 @@ export interface SiteConfig {
   heroCardFeature1Desc?: string;
   heroCardFeature2Title?: string;
   heroCardFeature2Desc?: string;
+  // Text Colors
+  textColorMain?: string;
+  textColorHighlight?: string;
+  textColorBody?: string;
+  textColorCard?: string;
+  textColorButton?: string;
+  // 9 Photos & Captions
+  photo1?: string;
+  photo1Caption?: string;
+  photo2?: string;
+  photo2Caption?: string;
+  photo3?: string;
+  photo3Caption?: string;
+  photo4?: string;
+  photo4Caption?: string;
+  photo5?: string;
+  photo5Caption?: string;
+  photo6?: string;
+  photo6Caption?: string;
+  photo7?: string;
+  photo7Caption?: string;
+  photo8?: string;
+  photo8Caption?: string;
+  photo9?: string;
+  photo9Caption?: string;
   waNumberDisplay: string;
   waNumberDigits: string;
   organizationAddress: string;
