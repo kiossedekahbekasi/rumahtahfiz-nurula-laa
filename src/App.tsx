@@ -28,6 +28,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { AiAssistantModal } from './components/AiAssistantModal';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { Footer } from './components/Footer';
+import { PhotoGallerySection } from './components/PhotoGallerySection';
 
 // Local Storage Keys
 const STORAGE_KEY_PRODUCTS = 'ksb_products_data_v1';
@@ -309,6 +310,9 @@ export default function App() {
         {activeTab === 'kalkulator' && (
           <ZakatKalkulator onAddInfaqToCart={handleAddInfaqToCart} />
         )}
+
+        {/* 9 Photos Showcase Gallery */}
+        <PhotoGallerySection siteConfig={siteConfig} />
       </main>
 
       {/* Footer & FAQ */}

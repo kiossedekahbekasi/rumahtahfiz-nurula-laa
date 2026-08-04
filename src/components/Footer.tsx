@@ -10,11 +10,11 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onOpenAdmin, siteConfig }) => {
   const appName = siteConfig?.appName || 'KIOS SEDEKAH BEKASI';
-  const appSubtitle = siteConfig?.appSubtitle || '& Rumah Tahfizh Nurul ALAA';
+  const appSubtitle = siteConfig?.appSubtitle || '& Rumah Tahfizh';
   const footerDesc = siteConfig?.footerDescription || "Inisiatif Muamalah & Pendidikan Dakwah Terpadu. Belanja sembako berkualitas dengan harga jujur, menyokong langsung ratusan porsi nasi gizi dan beasiswa santri penghafal Al-Qur'an yatim & dhuafa.";
-  const address = siteConfig?.organizationAddress || 'Jl. Rasuna Said';
-  const waDisplay = siteConfig?.waNumberDisplay || '089505670423';
-  const waDigits = siteConfig?.waNumberDigits || '6289505670423';
+  const address = siteConfig?.organizationAddress || 'Jl. Masjid Al-Ikhlas No. 45, RT 03/RW 07, Jatiasih, Kota Bekasi, Jawa Barat 17423';
+  const waDisplay = siteConfig?.waNumberDisplay || '0812-3456-7890';
+  const waDigits = siteConfig?.waNumberDigits || '6281234567890';
   const bankAccount = siteConfig?.bankBsiAccount || '7123-4567-89';
   const bankName = siteConfig?.bankBsiName || 'Bank Syariah Indonesia (BSI)';
   const accountHolder = siteConfig?.bankAccountHolder || 'Kios Sedekah Bekasi & Rumah Tahfizh';

@@ -39,6 +39,8 @@ import {
   Globe,
   Sliders,
   Upload,
+  Palette,
+  Camera,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -159,13 +161,31 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     }
   };
 
+  // Image upload handler for any of the 9 gallery photos from local device
+  const handleGalleryPhotoUpload = (photoKey: keyof SiteConfig, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran foto terlalu besar! Maksimal 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setSiteForm((prev) => ({ ...prev, [photoKey]: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Settings Credentials State
   const [editEmail, setEditEmail] = useState(adminEmail);
   const [editPassword, setEditPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Navigation tab inside Admin Panel
-  const [activeAdminTab, setActiveAdminTab] = useState<'sheets' | 'produk' | 'santri' | 'stats' | 'settings'>('sheets');
+  const [activeAdminTab, setActiveAdminTab] = useState<'sheets' | 'produk' | 'santri' | 'stats' | 'site' | 'settings'>('sheets');
 
   // Google Sheets settings state
   const [webhookUrl, setWebhookUrlState] = useState(getSheetsWebhookUrl());
@@ -660,6 +680,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </button>
 
               <button
+                onClick={() => setActiveAdminTab('site')}
+                className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs font-bold transition-all whitespace-nowrap ${
+                  activeAdminTab === 'site'
+                    ? 'bg-amber-400 text-emerald-950 shadow-md'
+                    : 'text-emerald-200 hover:bg-emerald-900'
+                }`}
+              >
+                <Palette className="w-4 h-4 flex-shrink-0" />
+                <span>Edit Warna, 9 Foto & Teks</span>
+              </button>
+
+              <button
                 onClick={() => setActiveAdminTab('settings')}
                 className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs font-bold transition-all whitespace-nowrap ${
                   activeAdminTab === 'settings'
@@ -1003,7 +1035,463 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 5: SETTINGS & CREDENTIAL MANAGEMENT */}
+              {/* TAB 5: WARNA TULISAN, 9 FOTO GALERI & GLOBAL TEKS */}
+              {activeAdminTab === 'site' && (
+                <div className="space-y-6">
+                  {authSuccessMsg && (
+                    <div className="p-3 bg-emerald-950 border border-emerald-700 rounded-xl text-xs text-emerald-200 font-bold flex items-center space-x-2 shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>{authSuccessMsg}</span>
+                    </div>
+                  )}
+
+                  {/* 1. KUSTOMISASI WARNA TULISAN */}
+                  <form onSubmit={handleSaveSiteConfig} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <Palette className="w-4 h-4 text-amber-400" />
+                        <span>Kustomisasi Warna Tulisan Situs</span>
+                      </h4>
+                      <span className="text-[10px] bg-amber-400 text-emerald-950 px-2.5 py-0.5 rounded-full font-extrabold uppercase">
+                        Warna Realtime
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300">
+                      Ubah warna tulisan judul utama, sorotan amber, deskripsi body, kartu, dan tombol secara mudah.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                      {/* Warna Tulisan Utama */}
+                      <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2">
+                        <label className="block text-slate-200 font-bold">Warna Tulisan Utama</label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={siteForm.textColorMain || '#ffffff'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorMain: e.target.value })}
+                            className="w-9 h-9 rounded-lg border border-slate-600 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={siteForm.textColorMain || '#ffffff'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorMain: e.target.value })}
+                            className="flex-1 px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-white font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Warna Tulisan Sorotan / Highlight */}
+                      <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2">
+                        <label className="block text-slate-200 font-bold">Warna Tulisan Sorotan (Highlight)</label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={siteForm.textColorHighlight || '#fbbf24'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorHighlight: e.target.value })}
+                            className="w-9 h-9 rounded-lg border border-slate-600 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={siteForm.textColorHighlight || '#fbbf24'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorHighlight: e.target.value })}
+                            className="flex-1 px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-amber-300 font-mono text-xs font-bold"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Warna Tulisan Deskripsi Body */}
+                      <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2">
+                        <label className="block text-slate-200 font-bold">Warna Tulisan Deskripsi / Body</label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={siteForm.textColorBody || '#a7f3d0'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorBody: e.target.value })}
+                            className="w-9 h-9 rounded-lg border border-slate-600 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={siteForm.textColorBody || '#a7f3d0'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorBody: e.target.value })}
+                            className="flex-1 px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-emerald-200 font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Warna Tulisan Kartu / Label */}
+                      <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2">
+                        <label className="block text-slate-200 font-bold">Warna Tulisan Kartu & Badge</label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={siteForm.textColorCard || '#fef08a'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorCard: e.target.value })}
+                            className="w-9 h-9 rounded-lg border border-slate-600 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={siteForm.textColorCard || '#fef08a'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorCard: e.target.value })}
+                            className="flex-1 px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-amber-200 font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Warna Tulisan Tombol Action */}
+                      <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 space-y-2 sm:col-span-2 md:col-span-1">
+                        <label className="block text-slate-200 font-bold">Warna Tulisan Tombol / CTA</label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="color"
+                            value={siteForm.textColorButton || '#022c22'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorButton: e.target.value })}
+                            className="w-9 h-9 rounded-lg border border-slate-600 bg-transparent cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={siteForm.textColorButton || '#022c22'}
+                            onChange={(e) => setSiteForm({ ...siteForm, textColorButton: e.target.value })}
+                            className="flex-1 px-2.5 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-emerald-300 font-mono text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs rounded-xl shadow transition-all flex items-center space-x-2"
+                      >
+                        <Palette className="w-4 h-4 text-emerald-950" />
+                        <span>Simpan Perubahan Warna Tulisan</span>
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* 2. KELOLA 9 FOTO GALERI */}
+                  <form onSubmit={handleSaveSiteConfig} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5">
+                    <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <Camera className="w-4 h-4 text-amber-400" />
+                        <span>Kelola 9 Foto Galeri Kegiatan & Kios</span>
+                      </h4>
+                      <span className="text-[10px] bg-emerald-800 text-amber-300 border border-emerald-600 px-2.5 py-0.5 rounded-full font-extrabold uppercase">
+                        9 Slot Foto
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300">
+                      Unggah foto langsung dari perangkat atau tempel URL gambar untuk Foto 1 s/d Foto 9.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[
+                        { num: 1, key: 'photo1' as keyof SiteConfig, capKey: 'photo1Caption' as keyof SiteConfig, label: 'Foto Pertama (Foto 1)' },
+                        { num: 2, key: 'photo2' as keyof SiteConfig, capKey: 'photo2Caption' as keyof SiteConfig, label: 'Foto Kedua (Foto 2)' },
+                        { num: 3, key: 'photo3' as keyof SiteConfig, capKey: 'photo3Caption' as keyof SiteConfig, label: 'Foto Ketiga (Foto 3)' },
+                        { num: 4, key: 'photo4' as keyof SiteConfig, capKey: 'photo4Caption' as keyof SiteConfig, label: 'Foto Keempat (Foto 4)' },
+                        { num: 5, key: 'photo5' as keyof SiteConfig, capKey: 'photo5Caption' as keyof SiteConfig, label: 'Foto Kelima (Foto 5)' },
+                        { num: 6, key: 'photo6' as keyof SiteConfig, capKey: 'photo6Caption' as keyof SiteConfig, label: 'Foto Keenam (Foto 6)' },
+                        { num: 7, key: 'photo7' as keyof SiteConfig, capKey: 'photo7Caption' as keyof SiteConfig, label: 'Foto Ketujuh (Foto 7)' },
+                        { num: 8, key: 'photo8' as keyof SiteConfig, capKey: 'photo8Caption' as keyof SiteConfig, label: 'Foto Kedelapan (Foto 8)' },
+                        { num: 9, key: 'photo9' as keyof SiteConfig, capKey: 'photo9Caption' as keyof SiteConfig, label: 'Foto Kesembilan (Foto 9)' },
+                      ].map((item) => {
+                        const photoVal = (siteForm[item.key] as string) || '';
+                        const captionVal = (siteForm[item.capKey] as string) || '';
+
+                        return (
+                          <div key={item.num} className="bg-slate-900 p-3.5 rounded-2xl border border-slate-700 space-y-3 flex flex-col justify-between">
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs font-bold text-amber-300 flex items-center space-x-1.5">
+                                  <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
+                                  <span>{item.label}</span>
+                                </span>
+                                <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono font-bold">
+                                  Slot {item.num}
+                                </span>
+                              </div>
+
+                              {/* Preview thumbnail */}
+                              {photoVal ? (
+                                <div className="relative aspect-video rounded-xl overflow-hidden border border-amber-400/50 mb-2 group">
+                                  <img
+                                    src={photoVal}
+                                    alt={`Preview ${item.label}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setSiteForm({ ...siteForm, [item.key]: '' })}
+                                    className="absolute top-2 right-2 p-1.5 bg-red-950/90 hover:bg-red-900 text-red-200 rounded-lg text-xs shadow transition-colors"
+                                    title="Hapus foto ini"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="aspect-video rounded-xl bg-slate-950 border border-dashed border-slate-700 mb-2 flex flex-col items-center justify-center text-slate-500 text-xs">
+                                  <Camera className="w-6 h-6 mb-1 text-slate-600" />
+                                  <span>Belum ada foto</span>
+                                </div>
+                              )}
+
+                              {/* File uploader & URL paste */}
+                              <div className="space-y-2">
+                                <label className="cursor-pointer bg-emerald-900 hover:bg-emerald-800 text-amber-300 w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center space-x-2 border border-emerald-700 transition-colors shadow-sm">
+                                  <Upload className="w-3.5 h-3.5 text-amber-300" />
+                                  <span>Ambil Foto dari Perangkat</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => handleGalleryPhotoUpload(item.key, e)}
+                                    className="hidden"
+                                  />
+                                </label>
+
+                                <input
+                                  type="url"
+                                  value={photoVal}
+                                  onChange={(e) => setSiteForm({ ...siteForm, [item.key]: e.target.value })}
+                                  placeholder="Atau tempel URL gambar (https://...)"
+                                  className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-[11px] focus:outline-none focus:border-amber-400"
+                                />
+
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                                    Keterangan / Judul Foto {item.num}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={captionVal}
+                                    onChange={(e) => setSiteForm({ ...siteForm, [item.capKey]: e.target.value })}
+                                    placeholder={`Keterangan untuk ${item.label}...`}
+                                    className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-xl text-amber-300 text-[11px] font-medium focus:outline-none focus:border-amber-400"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-700 flex justify-end">
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center space-x-2"
+                      >
+                        <Camera className="w-4 h-4 text-emerald-950" />
+                        <span>Simpan Perubahan 9 Foto Galeri</span>
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* 3. GLOBAL SITE TEXT EDITORS */}
+                  <form onSubmit={handleSaveSiteConfig} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <Type className="w-4 h-4 text-amber-400" />
+                        <span>Pengaturan Seluruh Tulisan & Teks Informasi Situs</span>
+                      </h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nama Utama Aplikasi / Brand</label>
+                        <input
+                          type="text"
+                          required
+                          value={siteForm.appName}
+                          onChange={(e) => setSiteForm({ ...siteForm, appName: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Sub-Judul / Label Lembaga</label>
+                        <input
+                          type="text"
+                          value={siteForm.appSubtitle}
+                          onChange={(e) => setSiteForm({ ...siteForm, appSubtitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Running Text Pengumuman Atas (Ticker)</label>
+                        <input
+                          type="text"
+                          value={siteForm.announcementText}
+                          onChange={(e) => setSiteForm({ ...siteForm, announcementText: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Badge Tagline Hero Atas</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroBadgeText}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBadgeText: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Tagline Motto Logo</label>
+                        <input
+                          type="text"
+                          value={siteForm.aboutTagline}
+                          onChange={(e) => setSiteForm({ ...siteForm, aboutTagline: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Utama Hero</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTitleMain}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTitleMain: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Sorotan Hero (Amber Gradient)</label>
+                        <input
+                          type="text"
+                          value={siteForm.heroTitleHighlight}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroTitleHighlight: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Deskripsi Lengkap Hero</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.heroSubtitle}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroSubtitle: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Target Beras Bulanan (Kg)</label>
+                        <input
+                          type="number"
+                          value={siteForm.heroBerasGoalKg}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBerasGoalKg: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Beras Terkumpul Saat Ini (Kg)</label>
+                        <input
+                          type="number"
+                          value={siteForm.heroBerasCurrentKg}
+                          onChange={(e) => setSiteForm({ ...siteForm, heroBerasCurrentKg: Number(e.target.value) })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor WhatsApp Tampilan (cth: 0812-3456-7890)</label>
+                        <input
+                          type="text"
+                          value={siteForm.waNumberDisplay}
+                          onChange={(e) => setSiteForm({ ...siteForm, waNumberDisplay: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor WA Format Internasional (cth: 6281234567890)</label>
+                        <input
+                          type="text"
+                          value={siteForm.waNumberDigits}
+                          onChange={(e) => setSiteForm({ ...siteForm, waNumberDigits: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nama Bank Infaq (cth: Bank Syariah Indonesia (BSI))</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankBsiName}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankBsiName: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Nomor Rekening Bank</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankBsiAccount}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankBsiAccount: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-mono font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Atas Nama Rekening</label>
+                        <input
+                          type="text"
+                          value={siteForm.bankAccountHolder}
+                          onChange={(e) => setSiteForm({ ...siteForm, bankAccountHolder: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">URL Repositori GitHub</label>
+                        <input
+                          type="url"
+                          value={siteForm.githubRepoUrl}
+                          onChange={(e) => setSiteForm({ ...siteForm, githubRepoUrl: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Alamat Lengkap Organisasi / Lembaga</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.organizationAddress}
+                          onChange={(e) => setSiteForm({ ...siteForm, organizationAddress: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Deskripsi Footer Bottom</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.footerDescription}
+                          onChange={(e) => setSiteForm({ ...siteForm, footerDescription: e.target.value })}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs rounded-xl shadow transition-all flex items-center space-x-2"
+                    >
+                      <Type className="w-4 h-4 text-emerald-950" />
+                      <span>Simpan Seluruh Perubahan Teks Situs</span>
+                    </button>
+                  </form>
+                </div>
+              )}
+
+              {/* TAB 6: SETTINGS & CREDENTIAL MANAGEMENT */}
               {activeAdminTab === 'settings' && (
                 <div className="space-y-6">
                   {authSuccessMsg && (

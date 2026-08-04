@@ -34,6 +34,12 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
   const feature2Title = siteConfig?.heroCardFeature2Title || 'Pendaftaran Santri';
   const feature2Desc = siteConfig?.heroCardFeature2Desc || '100% Gratis Yatim & Dhuafa';
 
+  // Custom text colors from siteConfig
+  const textColorMain = siteConfig?.textColorMain;
+  const textColorHighlight = siteConfig?.textColorHighlight;
+  const textColorBody = siteConfig?.textColorBody;
+  const textColorButton = siteConfig?.textColorButton;
+
   return (
     <div className="relative overflow-hidden bg-gradient-to-b from-emerald-900 via-emerald-850 to-slate-900 text-white pt-8 pb-14 px-4 border-b border-emerald-800">
       {/* Subtle Background Geometric Pattern */}
@@ -61,14 +67,17 @@ export const Hero: React.FC<HeroProps> = ({ setActiveTab, onOpenSedekahPackage, 
               </a>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight" style={textColorMain ? { color: textColorMain } : undefined}>
               {titleMain} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200">
+              <span 
+                className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-400 to-amber-200"
+                style={textColorHighlight ? { color: textColorHighlight, backgroundImage: 'none' } : undefined}
+              >
                 {titleHighlight}
               </span>
             </h1>
 
-            <p className="text-emerald-100 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
+            <p className="text-emerald-100 text-base sm:text-lg max-w-2xl font-normal leading-relaxed" style={textColorBody ? { color: textColorBody } : undefined}>
               {subtitle}
             </p>
 
