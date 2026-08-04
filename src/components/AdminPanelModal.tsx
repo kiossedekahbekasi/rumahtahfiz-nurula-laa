@@ -81,6 +81,8 @@ interface AdminPanelModalProps {
   siteConfig?: SiteConfig;
   setSiteConfig?: React.Dispatch<React.SetStateAction<SiteConfig>>;
   onResetData: () => void;
+  productToEdit?: SembakoProduct | null;
+  onClearProductToEdit?: () => void;
 }
 
 export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
@@ -105,6 +107,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   siteConfig,
   setSiteConfig,
   onResetData,
+  productToEdit,
+  onClearProductToEdit,
 }) => {
   // Auth Login state
   const [loginMode, setLoginMode] = useState<'email' | 'pin'>('email');
@@ -463,6 +467,16 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
     setProductForm({ ...p });
     setIsProductModalOpen(true);
   };
+
+  useEffect(() => {
+    if (isOpen && productToEdit) {
+      setActiveAdminTab('produk');
+      handleOpenEditProduct(productToEdit);
+      if (onClearProductToEdit) {
+        onClearProductToEdit();
+      }
+    }
+  }, [isOpen, productToEdit]);
 
   const handleSaveProduct = (e: React.FormEvent) => {
     e.preventDefault();
