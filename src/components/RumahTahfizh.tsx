@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Santri, ProgramTahfizh, SembakoProduct } from '../types';
+import { Santri, ProgramTahfizh, SembakoProduct, SiteConfig } from '../types';
 import { 
   BookOpen, 
   Award, 
@@ -20,6 +20,7 @@ interface RumahTahfizhProps {
   programs: ProgramTahfizh[];
   onSponsorSantri: (santriName: string) => void;
   onOpenRegisterForm: () => void;
+  siteConfig?: SiteConfig;
 }
 
 export const RumahTahfizh: React.FC<RumahTahfizhProps> = ({
@@ -27,6 +28,7 @@ export const RumahTahfizh: React.FC<RumahTahfizhProps> = ({
   programs,
   onSponsorSantri,
   onOpenRegisterForm,
+  siteConfig,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('semua');
   const [searchSantri, setSearchSantri] = useState<string>('');
@@ -38,14 +40,23 @@ export const RumahTahfizh: React.FC<RumahTahfizhProps> = ({
     return matchCat && matchName;
   });
 
-  const dailySchedules = [
-    { time: '04.00 - 05.00', activity: 'Shalat Subuh Berjamaah & Setoran Hafalan Baru', icon: Clock },
-    { time: '05.30 - 06.30', activity: 'Muraja\'ah Mandiri & Olahraga Pagi', icon: Clock },
-    { time: '07.00 - 15.00', activity: 'Makan Pagi Sembako Kios & Sekolah Formal (Bagi Yatim/Dhuafa)', icon: Clock },
-    { time: '15.30 - 17.30', activity: 'Kajian Tajwid, Makhorijul Huruf & Kelas Tahfizh Sore', icon: Clock },
-    { time: '18.00 - 20.00', activity: 'Shalat Maghrib, Makan Malam & Tasmi\' 1 Juz Per Santri', icon: Clock },
-    { time: '20.00 - 21.00', activity: 'Evaluasi Hafalan Bersama Ustadz & Istirahat Malam', icon: Clock },
+  // Dynamic schedules built from siteConfig with defaults
+  const scheduleBadge = siteConfig?.scheduleBadgeText || 'Rutinitas Asrama';
+  const scheduleTitle = siteConfig?.scheduleTitleMain || 'Jadwal Harian Santri Rumah Tahfizh';
+  const scheduleDesc = siteConfig?.scheduleSubtitle || 'Santri didisiplinkan dengan jadwal teratur sejak sepertiga malam hingga tidur, menyeimbangkan waktu menghafal, muraja\'ah, ibadah, dan nutrisi gizi sembako seimbang.';
+
+  const rawSchedules = [
+    { time: siteConfig?.schedule1Time ?? '04.00 - 05.00', activity: siteConfig?.schedule1Activity ?? 'Shalat Subuh Berjamaah & Setoran Hafalan Baru' },
+    { time: siteConfig?.schedule2Time ?? '05.30 - 06.30', activity: siteConfig?.schedule2Activity ?? 'Muraja\'ah Mandiri & Olahraga Pagi' },
+    { time: siteConfig?.schedule3Time ?? '07.00 - 15.00', activity: siteConfig?.schedule3Activity ?? 'Makan Pagi Sembako Kios & Sekolah Formal (Bagi Yatim/Dhuafa)' },
+    { time: siteConfig?.schedule4Time ?? '15.30 - 17.30', activity: siteConfig?.schedule4Activity ?? 'Kajian Tajwid, Makhorijul Huruf & Kelas Tahfizh Sore' },
+    { time: siteConfig?.schedule5Time ?? '18.00 - 20.00', activity: siteConfig?.schedule5Activity ?? 'Shalat Maghrib, Makan Malam & Tasmi\' 1 Juz Per Santri' },
+    { time: siteConfig?.schedule6Time ?? '20.00 - 21.00', activity: siteConfig?.schedule6Activity ?? 'Evaluasi Hafalan Bersama Ustadz & Istirahat Malam' },
+    { time: siteConfig?.schedule7Time, activity: siteConfig?.schedule7Activity },
+    { time: siteConfig?.schedule8Time, activity: siteConfig?.schedule8Activity },
   ];
+
+  const dailySchedules = rawSchedules.filter((s) => Boolean(s.time && s.activity));
 
   return (
     <section className="py-12 bg-emerald-950 text-white min-h-[700px] border-b border-emerald-800">
@@ -242,13 +253,13 @@ export const RumahTahfizh: React.FC<RumahTahfizhProps> = ({
           <div className="lg:col-span-5 space-y-4">
             <div className="inline-flex items-center space-x-1.5 text-amber-300 text-xs font-bold uppercase">
               <Clock className="w-4 h-4 text-amber-400" />
-              <span>Rutinitas Asrama</span>
+              <span>{scheduleBadge}</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-black text-white">
-              Jadwal Harian Santri Rumah Tahfizh
+              {scheduleTitle}
             </h3>
             <p className="text-emerald-200 text-xs sm:text-sm leading-relaxed">
-              Santri didisiplinkan dengan jadwal teratur sejak sepertiga malam hingga tidur, menyeimbangkan waktu menghafal, muraja'ah, ibadah, dan nutrisi gizi sembako seimbang.
+              {scheduleDesc}
             </p>
           </div>
 
