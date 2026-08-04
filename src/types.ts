@@ -147,6 +147,7 @@ export interface SiteConfig {
   photo9?: string;
   photo9Caption?: string;
   // Schedule Section Customization
+  programHeaderTitle?: string;
   scheduleBadgeText?: string;
   scheduleTitleMain?: string;
   scheduleSubtitle?: string;
