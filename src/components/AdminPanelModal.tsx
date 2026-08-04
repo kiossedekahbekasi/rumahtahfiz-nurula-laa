@@ -41,6 +41,8 @@ import {
   Upload,
   Palette,
   Camera,
+  Clock,
+  Calendar,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -1284,6 +1286,108 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                       >
                         <Camera className="w-4 h-4 text-emerald-950" />
                         <span>Simpan Perubahan 9 Foto Galeri</span>
+                      </button>
+                    </div>
+                  </form>
+
+                  {/* 3. KELOLA JADWAL HARIAN SANTRI RUMAH TAHFIZH */}
+                  <form onSubmit={handleSaveSiteConfig} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 space-y-5">
+                    <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <Clock className="w-4 h-4 text-amber-400" />
+                        <span>Kelola Jadwal Harian Santri Rumah Tahfizh</span>
+                      </h4>
+                      <span className="text-[10px] bg-amber-400 text-emerald-950 px-2.5 py-0.5 rounded-full font-extrabold uppercase">
+                        Rutinitas Santri
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300">
+                      Ubah judul section, badge, deskripsi, serta jadwal waktu dan kegiatan harian para santri.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Badge Atas Judul</label>
+                        <input
+                          type="text"
+                          value={siteForm.scheduleBadgeText || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, scheduleBadgeText: e.target.value })}
+                          placeholder="Rutinitas Asrama"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Utama Section Jadwal</label>
+                        <input
+                          type="text"
+                          value={siteForm.scheduleTitleMain || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, scheduleTitleMain: e.target.value })}
+                          placeholder="Jadwal Harian Santri Rumah Tahfizh"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Deskripsi Singkat Jadwal Harian</label>
+                        <textarea
+                          rows={2}
+                          value={siteForm.scheduleSubtitle || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, scheduleSubtitle: e.target.value })}
+                          placeholder="Deskripsi kegiatan disiplin santri..."
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Slot Jadwal 1 s/d 8 */}
+                    <div className="space-y-3 pt-2 border-t border-slate-700">
+                      <label className="block text-xs font-bold text-amber-300">
+                        Daftar Baris Waktu & Kegiatan (Slot 1 s/d 8)
+                      </label>
+
+                      <div className="grid grid-cols-1 gap-2.5">
+                        {[
+                          { num: 1, timeKey: 'schedule1Time' as keyof SiteConfig, actKey: 'schedule1Activity' as keyof SiteConfig },
+                          { num: 2, timeKey: 'schedule2Time' as keyof SiteConfig, actKey: 'schedule2Activity' as keyof SiteConfig },
+                          { num: 3, timeKey: 'schedule3Time' as keyof SiteConfig, actKey: 'schedule3Activity' as keyof SiteConfig },
+                          { num: 4, timeKey: 'schedule4Time' as keyof SiteConfig, actKey: 'schedule4Activity' as keyof SiteConfig },
+                          { num: 5, timeKey: 'schedule5Time' as keyof SiteConfig, actKey: 'schedule5Activity' as keyof SiteConfig },
+                          { num: 6, timeKey: 'schedule6Time' as keyof SiteConfig, actKey: 'schedule6Activity' as keyof SiteConfig },
+                          { num: 7, timeKey: 'schedule7Time' as keyof SiteConfig, actKey: 'schedule7Activity' as keyof SiteConfig },
+                          { num: 8, timeKey: 'schedule8Time' as keyof SiteConfig, actKey: 'schedule8Activity' as keyof SiteConfig },
+                        ].map((slot) => (
+                          <div key={slot.num} className="bg-slate-900 p-2.5 rounded-xl border border-slate-700 flex flex-col sm:flex-row items-center gap-2">
+                            <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-1 rounded font-mono font-bold whitespace-nowrap">
+                              Baris {slot.num}
+                            </span>
+                            <input
+                              type="text"
+                              value={(siteForm[slot.timeKey] as string) || ''}
+                              onChange={(e) => setSiteForm({ ...siteForm, [slot.timeKey]: e.target.value })}
+                              placeholder="cth: 04.00 - 05.00"
+                              className="w-full sm:w-36 px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-amber-300 font-bold text-xs focus:outline-none focus:border-amber-400"
+                            />
+                            <input
+                              type="text"
+                              value={(siteForm[slot.actKey] as string) || ''}
+                              onChange={(e) => setSiteForm({ ...siteForm, [slot.actKey]: e.target.value })}
+                              placeholder={`Deskripsi kegiatan baris ${slot.num}... (kosongkan jika tidak dipakai)`}
+                              className="w-full flex-1 px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:outline-none focus:border-amber-400"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        type="submit"
+                        className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-extrabold text-xs rounded-xl shadow transition-all flex items-center space-x-2"
+                      >
+                        <Clock className="w-4 h-4 text-emerald-950" />
+                        <span>Simpan Perubahan Jadwal Harian</span>
                       </button>
                     </div>
                   </form>
