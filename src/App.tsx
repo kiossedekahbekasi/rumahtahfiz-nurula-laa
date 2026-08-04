@@ -39,6 +39,7 @@ const STORAGE_KEY_ADMIN_PIN = 'ksb_admin_pin_code';
 const STORAGE_KEY_ADMIN_EMAIL = 'ksb_admin_email';
 const STORAGE_KEY_ADMIN_PASSWORD = 'ksb_admin_password';
 const STORAGE_KEY_SITE_CONFIG = 'ksb_site_config_v1';
+const STORAGE_KEY_PROGRAMS = 'ksb_programs_data_v1';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'kios' | 'tahfizh' | 'pendaftaran' | 'transparansi' | 'kalkulator'>('kios');
@@ -59,7 +60,10 @@ export default function App() {
     return saved ? JSON.parse(saved) : INITIAL_SANTRI;
   });
 
-  const [programs] = useState(PROGRAM_TAHFIZH_LIST);
+  const [programs, setPrograms] = useState<ProgramTahfizh[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY_PROGRAMS);
+    return saved ? JSON.parse(saved) : PROGRAM_TAHFIZH_LIST;
+  });
 
   const [donations, setDonations] = useState<DonationRecord[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY_DONATIONS);
@@ -132,6 +136,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY_SITE_CONFIG, JSON.stringify(siteConfig));
   }, [siteConfig]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_PROGRAMS, JSON.stringify(programs));
+  }, [programs]);
 
   // Total items in cart
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -220,6 +228,7 @@ export default function App() {
     setProducts(INITIAL_PRODUCTS);
     setSiteConfig(INITIAL_SITE_CONFIG);
     setSantriList(INITIAL_SANTRI);
+    setPrograms(PROGRAM_TAHFIZH_LIST);
     setDonations(INITIAL_DONATIONS);
     setStats({
       berasKg: MOCK_TRANSPARENCY_STATS.totalSembakoTerjualKg,
@@ -233,6 +242,7 @@ export default function App() {
     localStorage.removeItem(STORAGE_KEY_PRODUCTS);
     localStorage.removeItem(STORAGE_KEY_SITE_CONFIG);
     localStorage.removeItem(STORAGE_KEY_SANTRI);
+    localStorage.removeItem(STORAGE_KEY_PROGRAMS);
     localStorage.removeItem(STORAGE_KEY_DONATIONS);
     localStorage.removeItem(STORAGE_KEY_STATS);
     localStorage.removeItem(STORAGE_KEY_ADMIN_PIN);
@@ -344,6 +354,8 @@ export default function App() {
         setProducts={setProducts}
         santriList={santriList}
         setSantriList={setSantriList}
+        programs={programs}
+        setPrograms={setPrograms}
         donations={donations}
         setDonations={setDonations}
         stats={stats}
