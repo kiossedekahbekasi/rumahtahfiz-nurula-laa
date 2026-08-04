@@ -292,6 +292,7 @@ export default function App() {
             programs={programs}
             onSponsorSantri={handleSponsorSantri}
             onOpenRegisterForm={() => setActiveTab('pendaftaran')}
+            siteConfig={siteConfig}
           />
         )}
 
