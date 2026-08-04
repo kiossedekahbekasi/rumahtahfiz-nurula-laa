@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SembakoProduct, Santri, DonationRecord, ProductCategory, SiteConfig } from '../types';
+import { SembakoProduct, Santri, DonationRecord, ProductCategory, SiteConfig, ProgramTahfizh } from '../types';
 import { INITIAL_SITE_CONFIG } from '../data/mockData';
 import { 
   getSheetsWebhookUrl, 
@@ -43,6 +43,9 @@ import {
   Camera,
   Clock,
   Calendar,
+  BookOpen,
+  GraduationCap,
+  Award,
   Image as ImageIcon
 } from 'lucide-react';
 
@@ -53,6 +56,8 @@ interface AdminPanelModalProps {
   setProducts: React.Dispatch<React.SetStateAction<SembakoProduct[]>>;
   santriList: Santri[];
   setSantriList: React.Dispatch<React.SetStateAction<Santri[]>>;
+  programs?: ProgramTahfizh[];
+  setPrograms?: React.Dispatch<React.SetStateAction<ProgramTahfizh[]>>;
   donations: DonationRecord[];
   setDonations: React.Dispatch<React.SetStateAction<DonationRecord[]>>;
   stats: {
@@ -85,6 +90,8 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   setProducts,
   santriList,
   setSantriList,
+  programs = [],
+  setPrograms,
   donations,
   setDonations,
   stats,
@@ -187,7 +194,107 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Navigation tab inside Admin Panel
-  const [activeAdminTab, setActiveAdminTab] = useState<'sheets' | 'produk' | 'santri' | 'stats' | 'site' | 'settings'>('sheets');
+  const [activeAdminTab, setActiveAdminTab] = useState<'sheets' | 'produk' | 'santri' | 'program' | 'stats' | 'site' | 'settings'>('sheets');
+
+  // Program Tahfizh Form State (Add / Edit)
+  const [editingProgram, setEditingProgram] = useState<ProgramTahfizh | null>(null);
+  const [isProgramModalOpen, setIsProgramModalOpen] = useState(false);
+  const [programForm, setProgramForm] = useState<{
+    title: string;
+    badge: string;
+    schedule: string;
+    description: string;
+    targetAudience: string;
+    featureListText: string;
+    iconName: string;
+  }>({
+    title: '',
+    badge: '100% BEASISWA GRATIS',
+    schedule: 'Senin - Ahad (Asrama Mukim)',
+    description: '',
+    targetAudience: 'Anak Yatim & Dhuafa Usia 8 - 15 Tahun',
+    featureListText: 'Asrama nyaman dan sehat\nAsupan sembako & nutrisi harian dijamin Kios Sedekah\nTarget 30 Juz dalam 2 tahun',
+    iconName: 'BookOpen',
+  });
+
+  const handleOpenAddProgram = () => {
+    setEditingProgram(null);
+    setProgramForm({
+      title: '',
+      badge: '100% BEASISWA GRATIS',
+      schedule: 'Senin - Ahad (Asrama Mukim)',
+      description: '',
+      targetAudience: 'Anak Yatim & Dhuafa Usia 8 - 15 Tahun',
+      featureListText: 'Asrama nyaman dan sehat\nAsupan sembako & nutrisi harian dijamin Kios Sedekah\nTarget 30 Juz dalam 2 tahun',
+      iconName: 'BookOpen',
+    });
+    setIsProgramModalOpen(true);
+  };
+
+  const handleOpenEditProgram = (prog: ProgramTahfizh) => {
+    setEditingProgram(prog);
+    setProgramForm({
+      title: prog.title,
+      badge: prog.badge,
+      schedule: prog.schedule,
+      description: prog.description,
+      targetAudience: prog.targetAudience,
+      featureListText: prog.featureList ? prog.featureList.join('\n') : '',
+      iconName: prog.iconName || 'BookOpen',
+    });
+    setIsProgramModalOpen(true);
+  };
+
+  const handleSaveProgram = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!setPrograms) return;
+
+    const featureList = programForm.featureListText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (editingProgram) {
+      const updated: ProgramTahfizh = {
+        ...editingProgram,
+        title: programForm.title,
+        badge: programForm.badge,
+        schedule: programForm.schedule,
+        description: programForm.description,
+        targetAudience: programForm.targetAudience,
+        featureList,
+        iconName: programForm.iconName,
+      };
+      setPrograms((prev) => prev.map((p) => (p.id === editingProgram.id ? updated : p)));
+      setAuthSuccessMsg('Program Tahfizh berhasil diperbarui!');
+    } else {
+      const newProg: ProgramTahfizh = {
+        id: `prog-${Date.now()}`,
+        title: programForm.title,
+        badge: programForm.badge,
+        schedule: programForm.schedule,
+        description: programForm.description,
+        targetAudience: programForm.targetAudience,
+        featureList,
+        iconName: programForm.iconName,
+      };
+      setPrograms((prev) => [...prev, newProg]);
+      setAuthSuccessMsg('Program Tahfizh baru berhasil ditambahkan!');
+    }
+
+    setIsProgramModalOpen(false);
+    setTimeout(() => setAuthSuccessMsg(''), 4000);
+  };
+
+  const handleDeleteProgram = (id: string) => {
+    if (confirm('Apakah Anda yakin ingin menghapus kartu program ini?')) {
+      if (setPrograms) {
+        setPrograms((prev) => prev.filter((p) => p.id !== id));
+        setAuthSuccessMsg('Program Tahfizh berhasil dihapus.');
+        setTimeout(() => setAuthSuccessMsg(''), 4000);
+      }
+    }
+  };
 
   // Google Sheets settings state
   const [webhookUrl, setWebhookUrlState] = useState(getSheetsWebhookUrl());
@@ -670,6 +777,18 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
               </button>
 
               <button
+                onClick={() => setActiveAdminTab('program')}
+                className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs font-bold transition-all whitespace-nowrap ${
+                  activeAdminTab === 'program'
+                    ? 'bg-amber-400 text-emerald-950 shadow-md'
+                    : 'text-emerald-200 hover:bg-emerald-900'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 flex-shrink-0" />
+                <span>Program Tahfizh ({programs.length})</span>
+              </button>
+
+              <button
                 onClick={() => setActiveAdminTab('stats')}
                 className={`flex items-center space-x-2.5 px-3.5 py-2.5 rounded-xl text-left text-xs font-bold transition-all whitespace-nowrap ${
                   activeAdminTab === 'stats'
@@ -975,6 +1094,88 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                             title="Hapus Santri"
                           >
                             <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3.5: KELOLA PROGRAM PENDIDIKAN TAHFIZH */}
+              {activeAdminTab === 'program' && (
+                <div className="space-y-6">
+                  {authSuccessMsg && (
+                    <div className="p-3 bg-emerald-950 border border-emerald-700 rounded-xl text-xs text-emerald-200 font-bold flex items-center space-x-2 shadow-lg">
+                      <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>{authSuccessMsg}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                    <div>
+                      <h4 className="font-bold text-sm text-white flex items-center space-x-2">
+                        <BookOpen className="w-4 h-4 text-amber-400" />
+                        <span>Kelola Kartu Program Pendidikan Tahfizh ({programs.length})</span>
+                      </h4>
+                      <p className="text-xs text-slate-300 mt-0.5">
+                        Tambah, edit, atau hapus kartu program pendidikan tahfizh yang tampil pada halaman situs.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleOpenAddProgram}
+                      className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow flex items-center space-x-1.5 flex-shrink-0"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Tambah Program Baru</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {programs.map((prog) => (
+                      <div
+                        key={prog.id}
+                        className="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:border-amber-400/50 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                      >
+                        <div className="space-y-2 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-400 text-emerald-950">
+                              {prog.badge}
+                            </span>
+                            <span className="text-xs text-amber-300 font-semibold flex items-center space-x-1">
+                              <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                              <span>{prog.schedule}</span>
+                            </span>
+                          </div>
+
+                          <h5 className="font-black text-sm text-white">{prog.title}</h5>
+                          <p className="text-xs text-slate-300 leading-relaxed">{prog.description}</p>
+
+                          <div className="pt-2 border-t border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
+                            <div className="text-slate-300">
+                              <span className="text-amber-300 font-semibold">Sasaran: </span>
+                              <strong>{prog.targetAudience}</strong>
+                            </div>
+                            <div className="text-slate-400 text-[11px]">
+                              {prog.featureList?.length || 0} Poin Keunggulan / Fasilitas
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-2 flex-shrink-0 self-end md:self-center">
+                          <button
+                            onClick={() => handleOpenEditProgram(prog)}
+                            className="px-3 py-2 bg-emerald-900 hover:bg-emerald-800 text-amber-300 border border-emerald-700 rounded-xl text-xs font-bold transition-colors flex items-center space-x-1"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit Card</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProgram(prog.id)}
+                            className="px-3 py-2 bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 rounded-xl text-xs font-bold transition-colors flex items-center space-x-1"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Hapus</span>
                           </button>
                         </div>
                       </div>
@@ -1307,8 +1508,19 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="sm:col-span-2">
+                        <label className="block text-slate-300 font-semibold mb-1">Judul Header Section Program Pendidikan Tahfizh</label>
+                        <input
+                          type="text"
+                          value={siteForm.programHeaderTitle || ''}
+                          onChange={(e) => setSiteForm({ ...siteForm, programHeaderTitle: e.target.value })}
+                          placeholder="Program Pendidikan Tahfizh Al-Qur'an"
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:border-amber-400"
+                        />
+                      </div>
+
                       <div>
-                        <label className="block text-slate-300 font-semibold mb-1">Badge Atas Judul</label>
+                        <label className="block text-slate-300 font-semibold mb-1">Badge Atas Judul Jadwal</label>
                         <input
                           type="text"
                           value={siteForm.scheduleBadgeText || ''}
@@ -2432,6 +2644,122 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
                   type="button"
                   onClick={() => setIsSantriModalOpen(false)}
                   className="px-4 py-2.5 bg-slate-800 text-slate-300 font-bold rounded-xl"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD / EDIT PROGRAM TAHFIZH MODAL */}
+      {isProgramModalOpen && (
+        <div className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h4 className="font-bold text-white text-base flex items-center space-x-2">
+                <BookOpen className="w-5 h-5 text-amber-400" />
+                <span>{editingProgram ? 'Edit Program Tahfizh' : 'Tambah Program Tahfizh Baru'}</span>
+              </h4>
+              <button
+                onClick={() => setIsProgramModalOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProgram} className="space-y-4 text-xs">
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Judul Program Tahfizh</label>
+                <input
+                  type="text"
+                  required
+                  value={programForm.title}
+                  onChange={(e) => setProgramForm({ ...programForm, title: e.target.value })}
+                  placeholder="Contoh: Program Mukim Beasiswa Full Yatim & Dhuafa"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white font-bold focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Badge Sorotan (Kuning)</label>
+                  <input
+                    type="text"
+                    required
+                    value={programForm.badge}
+                    onChange={(e) => setProgramForm({ ...programForm, badge: e.target.value })}
+                    placeholder="Contoh: 100% BEASISWA GRATIS"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-amber-300 font-bold focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-semibold mb-1">Jadwal & Waktu Program</label>
+                  <input
+                    type="text"
+                    required
+                    value={programForm.schedule}
+                    onChange={(e) => setProgramForm({ ...programForm, schedule: e.target.value })}
+                    placeholder="Contoh: Senin - Ahad (Asrama Mukim)"
+                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Deskripsi Ringkas Program</label>
+                <textarea
+                  rows={3}
+                  required
+                  value={programForm.description}
+                  onChange={(e) => setProgramForm({ ...programForm, description: e.target.value })}
+                  placeholder="Fasilitas tempat tinggal, tempat belajar, makanan gizi sembako gratis..."
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">Sasaran Peserta / Usia</label>
+                <input
+                  type="text"
+                  required
+                  value={programForm.targetAudience}
+                  onChange={(e) => setProgramForm({ ...programForm, targetAudience: e.target.value })}
+                  placeholder="Contoh: Anak Yatim & Dhuafa Usia 8 - 15 Tahun"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-semibold mb-1">
+                  Daftar Fasilitas & Keunggulan (1 baris = 1 poin centang)
+                </label>
+                <textarea
+                  rows={4}
+                  value={programForm.featureListText}
+                  onChange={(e) => setProgramForm({ ...programForm, featureListText: e.target.value })}
+                  placeholder={`Asrama nyaman dan sehat\nAsupan sembako & nutrisi harian dijamin Kios Sedekah\nTarget 30 Juz dalam 2 tahun`}
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400 leading-relaxed font-mono text-[11px]"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Setiap baris baru akan dijadikan 1 poin fasilitas dengan ikon centang di kartu program.
+                </p>
+              </div>
+
+              <div className="pt-3 flex gap-2">
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold rounded-xl shadow transition-all"
+                >
+                  {editingProgram ? 'Simpan Perubahan Program' : 'Tambah Program Baru'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsProgramModalOpen(false)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all"
                 >
                   Batal
                 </button>
