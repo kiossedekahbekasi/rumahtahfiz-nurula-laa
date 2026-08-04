@@ -146,6 +146,26 @@ export interface SiteConfig {
   photo8Caption?: string;
   photo9?: string;
   photo9Caption?: string;
+  // Schedule Section Customization
+  scheduleBadgeText?: string;
+  scheduleTitleMain?: string;
+  scheduleSubtitle?: string;
+  schedule1Time?: string;
+  schedule1Activity?: string;
+  schedule2Time?: string;
+  schedule2Activity?: string;
+  schedule3Time?: string;
+  schedule3Activity?: string;
+  schedule4Time?: string;
+  schedule4Activity?: string;
+  schedule5Time?: string;
+  schedule5Activity?: string;
+  schedule6Time?: string;
+  schedule6Activity?: string;
+  schedule7Time?: string;
+  schedule7Activity?: string;
+  schedule8Time?: string;
+  schedule8Activity?: string;
   waNumberDisplay: string;
   waNumberDigits: string;
   organizationAddress: string;
