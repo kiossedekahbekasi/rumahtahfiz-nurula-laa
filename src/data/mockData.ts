@@ -51,6 +51,7 @@ export const INITIAL_SITE_CONFIG: SiteConfig = {
   photo9: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800',
   photo9Caption: 'Foto Kesembilan: Suasana Asrama & Kelas Tahfizh',
   // Default Schedule Values
+  programHeaderTitle: 'Program Pendidikan Tahfizh',
   scheduleBadgeText: 'Rutinitas Asrama',
   scheduleTitleMain: 'Jadwal Harian Santri Rumah Tahfizh',
   scheduleSubtitle: 'Santri didisiplinkan dengan jadwal teratur sejak sepertiga malam hingga tidur, menyeimbangkan waktu menghafal, muraja\'ah, ibadah, dan nutrisi gizi sembako seimbang.',
