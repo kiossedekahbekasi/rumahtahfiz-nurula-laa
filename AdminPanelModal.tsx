@@ -369,8 +369,6 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
 
-  if (!isOpen) return null;
-
   // Handle Login Email & Password
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -662,6 +660,12 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
       }
     }
   };
+
+  // IMPORTANT: this conditional return must come AFTER every hook
+  // (useState/useEffect) above -- otherwise React throws a "Rendered more
+  // hooks than during the previous render" crash the moment the modal is
+  // opened, which unmounts the entire app and shows a blank white page.
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
